@@ -22,8 +22,9 @@ export default class ModelService {
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
-    public async findAll(filter: any): Promise<Model[]> {
-        const models = await this.modelRepository.findAll(filter);
+    public async findAll(type: string): Promise<Model[]> {
+        console.log(type)
+        const models = await this.modelRepository.findAll(type);
         return models;
     }
 

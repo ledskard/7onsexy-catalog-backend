@@ -27,9 +27,9 @@ export default class ModelController {
 
     public async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const { filter } = req.headers;
+            const { type } = req.query
             const modelService = new ModelService();
-            const model = await modelService.findAll(filter);
+            const model = await modelService.findAll(type.toString());
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);
@@ -46,5 +46,4 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
-
 }

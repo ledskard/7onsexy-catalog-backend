@@ -11,35 +11,9 @@ export const validateCreateUser = async (
         username: Joi.string().required().messages({
             "any.required": "o campo username é obrigatório",
         }),
-        email: Joi.string()
-            .email({
-                minDomainSegments: 2,
-            })
-            .required()
-            .messages({
-                "string.email": "Campo com email inválido",
-                "any.required": "O campo email é obrigatório",
-            }),
         password: Joi.string().required().messages({
             "any.required": "O campo password é obrigatório",
         }),
-        image: Joi.object().keys({
-            name: Joi.string().required().messages({
-                "any.required": "O campo name em image é obrigatório"
-            }),
-            base64: Joi.string().required().messages({
-                "any.required": "O campo base64 em image é obrigatório"
-            })
-        }),
-        backgroundImage: Joi.object().keys({
-            name: Joi.string().required().messages({
-                "any.required": "O campo name em image é obrigatório"
-            }),
-            base64: Joi.string().required().messages({
-                "any.required": "O campo base64 em image é obrigatório"
-            })
-        }),
-        placeholder: Joi.optional(),
     });
     try {
         await validateBody(req, next, schema);

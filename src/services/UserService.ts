@@ -21,7 +21,7 @@ export default class UserService {
     }
 
     public async create(data: ICreateUserDTO): Promise<User | undefined> {
-        const verifyAlreadyExistUser = await this.userRepository.findByEmail(data.email) || await this.userRepository.findByUsername(data.username);
+        const verifyAlreadyExistUser = await this.userRepository.findByUsername(data.username);
         if (verifyAlreadyExistUser) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         const user = await this.userRepository.create(data);
         return user;

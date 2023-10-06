@@ -23,12 +23,11 @@ export class ModelRepository {
             .getOne();
         return model;
     }
-    public async findAll(filters: any): Promise<Model[]> {
+    public async findAll(type: string): Promise<Model[]> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
-        if(filters.type) {
-            const typeFilter = filters.type
-            model.andWhere("m.type = :typeFilter", {typeFilter})
+        if(type) {
+            model.andWhere("m.type = :type", {type})
         }
             
         return model.getMany();;
@@ -36,7 +35,7 @@ export class ModelRepository {
     public async findByUsername(username: string): Promise<Model | undefined> {
         const model = await this.modelRepository
             .createQueryBuilder("u")
-            .leftJoinAndSelect("u.image", "image")
+            // .leftJoinAndSelect("u.image", "image")
             .where("u.username = :username", {username})
             .getOne();
         return model;

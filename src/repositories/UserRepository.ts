@@ -19,7 +19,6 @@ export class UserRepository {
     public async findById(id: string): Promise<User | undefined> {
         const user = await this.userRepository
             .createQueryBuilder("u")
-            .leftJoinAndSelect("u.image", "image")
             .where("u.id = :id", {id})
             .getOne();
         return user;
@@ -28,16 +27,7 @@ export class UserRepository {
     public async findByUsername(username: string): Promise<User | undefined> {
         const user = await this.userRepository
             .createQueryBuilder("u")
-            .leftJoinAndSelect("u.image", "image")
             .where("u.username = :username", {username})
-            .getOne();
-        return user;
-    }
-
-    public async findByEmail(email: string): Promise<User | undefined> {
-        const user = await this.userRepository
-            .createQueryBuilder("u")
-            .andWhere("u.email = :email", {email})
             .getOne();
         return user;
     }
