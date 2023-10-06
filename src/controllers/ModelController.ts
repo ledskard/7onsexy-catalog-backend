@@ -29,7 +29,8 @@ export default class ModelController {
         try {
             const { type } = req.query
             const modelService = new ModelService();
-            const model = await modelService.findAll(type.toString());
+            const typeString = type ? type.toString() : null;
+            const model = await modelService.findAll(typeString);
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);
@@ -46,4 +47,5 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
+
 }

@@ -40,10 +40,18 @@ exports.validateCreateModel = void 0;
 var Joi = require("joi");
 var SchemaValidator_1 = require("../utils/validators/SchemaValidator");
 var validateCreateModel = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var schema, error_1;
+    var imageSchema, schema, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                imageSchema = Joi.object().keys({
+                    name: Joi.string().required().messages({
+                        "any.required": "O campo name em image é obrigatório"
+                    }),
+                    base64: Joi.string().required().messages({
+                        "any.required": "O campo base64 em image é obrigatório"
+                    })
+                });
                 schema = Joi.object().keys({
                     username: Joi.string().required().messages({
                         "any.required": "o campo username é obrigatório",
@@ -53,6 +61,9 @@ var validateCreateModel = function (req, res, next) { return __awaiter(void 0, v
                     }),
                     description: Joi.string().required().messages({
                         "any.required": "O campo description é obrigatório",
+                    }),
+                    type: Joi.string().required().messages({
+                        "any.required": "O campo type é obrigatório",
                     }),
                     telegramVip: Joi.string().uri().required().messages({
                         "any.required": "O campo telegramVip é obrigatório",
@@ -65,14 +76,9 @@ var validateCreateModel = function (req, res, next) { return __awaiter(void 0, v
                     likes: Joi.number().required().messages({
                         "any.required": "O campo likes é obrigatório",
                     }),
-                    // image: Joi.object().keys({
-                    //     name: Joi.string().required().messages({
-                    //         "any.required": "O campo name em image é obrigatório"
-                    //     }),
-                    //     base64: Joi.string().required().messages({
-                    //         "any.required": "O campo base64 em image é obrigatório"
-                    //     })
-                    // }),
+                    images: Joi.array().items(imageSchema).required().messages({
+                        "any.required": "O campo images é obrigatório"
+                    })
                 });
                 _a.label = 1;
             case 1:

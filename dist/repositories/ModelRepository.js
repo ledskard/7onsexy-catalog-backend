@@ -66,6 +66,7 @@ var ModelRepository = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository
                             .createQueryBuilder("m")
+                            .leftJoinAndSelect("m.images", "mi")
                             .where("m.id = :id", { id: id })
                             .getOne()];
                     case 1:
@@ -81,7 +82,8 @@ var ModelRepository = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository
-                            .createQueryBuilder("m")];
+                            .createQueryBuilder("m")
+                            .leftJoinAndSelect("m.images", "mi")];
                     case 1:
                         model = _a.sent();
                         if (type) {
@@ -98,9 +100,9 @@ var ModelRepository = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository
-                            .createQueryBuilder("u")
-                            // .leftJoinAndSelect("u.image", "image")
-                            .where("u.username = :username", { username: username })
+                            .createQueryBuilder("m")
+                            .leftJoinAndSelect("m.images", "mi")
+                            .where("m.username = :username", { username: username })
                             .getOne()];
                     case 1:
                         model = _a.sent();

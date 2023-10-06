@@ -19,6 +19,7 @@ export class ModelRepository {
     public async findById(id: string): Promise<Model | undefined> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
             .where("m.id = :id", {id})
             .getOne();
         return model;
@@ -26,6 +27,7 @@ export class ModelRepository {
     public async findAll(type: string): Promise<Model[]> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
         if(type) {
             model.andWhere("m.type = :type", {type})
         }
@@ -34,9 +36,9 @@ export class ModelRepository {
     }
     public async findByUsername(username: string): Promise<Model | undefined> {
         const model = await this.modelRepository
-            .createQueryBuilder("u")
-            // .leftJoinAndSelect("u.image", "image")
-            .where("u.username = :username", {username})
+            .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
+            .where("m.username = :username", {username})
             .getOne();
         return model;
     }

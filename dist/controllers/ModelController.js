@@ -84,14 +84,15 @@ var ModelController = /** @class */ (function () {
     };
     ModelController.prototype.findAll = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var type, modelService, model, err_3;
+            var type, modelService, typeString, model, err_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         type = req.query.type;
                         modelService = new ModelService_1.default();
-                        return [4 /*yield*/, modelService.findAll(type.toString())];
+                        typeString = type ? type.toString() : null;
+                        return [4 /*yield*/, modelService.findAll(typeString)];
                     case 1:
                         model = _a.sent();
                         return [2 /*return*/, res.status(200).json(model)];

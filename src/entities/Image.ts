@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from "typeorm";
+import { Model } from "./Model";
 
 @Entity("images")
 export class Image {
@@ -13,5 +14,9 @@ export class Image {
     name: string;
 
     base64?: string;
+
+    @ManyToOne(type => Model, model => model.images) 
+    @JoinColumn({ name: "model_id" }) 
+    model: Model;
 
 }

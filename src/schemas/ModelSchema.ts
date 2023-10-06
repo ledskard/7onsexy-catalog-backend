@@ -7,6 +7,16 @@ export const validateCreateModel = async (
     res: Response,
     next: NextFunction
 ): Promise<void | Response> => {
+
+    const imageSchema = Joi.object().keys({
+        name: Joi.string().required().messages({
+            "any.required": "O campo name em image é obrigatório"
+        }),
+        base64: Joi.string().required().messages({
+            "any.required": "O campo base64 em image é obrigatório"
+        })
+    });
+
     const schema = Joi.object().keys({
         username: Joi.string().required().messages({
             "any.required": "o campo username é obrigatório",
@@ -16,6 +26,9 @@ export const validateCreateModel = async (
         }),
         description: Joi.string().required().messages({
             "any.required": "O campo description é obrigatório",
+        }),
+        type: Joi.string().required().messages({
+            "any.required": "O campo type é obrigatório",
         }),
         telegramVip: Joi.string().uri().required().messages({  
             "any.required": "O campo telegramVip é obrigatório",
@@ -28,14 +41,9 @@ export const validateCreateModel = async (
         likes: Joi.number().required().messages({
             "any.required": "O campo likes é obrigatório",
         }),
-        // image: Joi.object().keys({
-        //     name: Joi.string().required().messages({
-        //         "any.required": "O campo name em image é obrigatório"
-        //     }),
-        //     base64: Joi.string().required().messages({
-        //         "any.required": "O campo base64 em image é obrigatório"
-        //     })
-        // }),
+        images: Joi.array().items(imageSchema).required().messages({
+        "any.required": "O campo images é obrigatório"
+    })
     });
     try {
         await validateBody(req, next, schema);

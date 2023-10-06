@@ -38,13 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ModelRepository_1 = require("../repositories/ModelRepository");
 var ErrorConstants_1 = require("../utils/constants/ErrorConstants");
+var ImageService_1 = require("./ImageService");
 var ModelService = /** @class */ (function () {
     function ModelService() {
         this.modelRepository = new ModelRepository_1.ModelRepository();
+        this.imageService = new ImageService_1.default();
     }
     ModelService.prototype.create = function (data) {
         return __awaiter(this, void 0, void 0, function () {
-            var verifyAlreadyExistModel, model;
+            var verifyAlreadyExistModel, model, error_1;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository.findByUsername(data.username)];
@@ -52,10 +55,44 @@ var ModelService = /** @class */ (function () {
                         verifyAlreadyExistModel = _a.sent();
                         if (verifyAlreadyExistModel)
                             throw { status: ErrorConstants_1.ErrorStatus.bad_request, message: ErrorConstants_1.ErrorMessage.user_already_registered };
-                        return [4 /*yield*/, this.modelRepository.create(data)];
+                        console.log(data.images);
+                        _a.label = 2;
                     case 2:
+                        _a.trys.push([2, 5, , 6]);
+                        return [4 /*yield*/, Promise.all(data.images.map(function (image) { return __awaiter(_this, void 0, void 0, function () {
+                                var imageResponse, error_2;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (!(image === null || image === void 0 ? void 0 : image.base64)) return [3 /*break*/, 4];
+                                            _a.label = 1;
+                                        case 1:
+                                            _a.trys.push([1, 3, , 4]);
+                                            return [4 /*yield*/, this.imageService.saveFile(image)];
+                                        case 2:
+                                            imageResponse = _a.sent();
+                                            image.url = imageResponse.imageUrl;
+                                            image.name = imageResponse.fileName;
+                                            delete image.base64;
+                                            return [3 /*break*/, 4];
+                                        case 3:
+                                            error_2 = _a.sent();
+                                            throw { code: ErrorConstants_1.ErrorStatus.internal_server_error, message: ErrorConstants_1.ErrorMessage.could_not_send_image };
+                                        case 4: return [2 /*return*/];
+                                    }
+                                });
+                            }); }))];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.modelRepository.create(data)];
+                    case 4:
                         model = _a.sent();
                         return [2 /*return*/, model];
+                    case 5:
+                        error_1 = _a.sent();
+                        // Lide com o erro aqui
+                        throw error_1;
+                    case 6: return [2 /*return*/];
                 }
             });
         });
@@ -80,9 +117,7 @@ var ModelService = /** @class */ (function () {
             var models;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log(type);
-                        return [4 /*yield*/, this.modelRepository.findAll(type)];
+                    case 0: return [4 /*yield*/, this.modelRepository.findAll(type)];
                     case 1:
                         models = _a.sent();
                         return [2 /*return*/, models];

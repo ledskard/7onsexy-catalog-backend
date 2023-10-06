@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Image } from "./Image";
 
 
 @Entity("model")
@@ -16,6 +17,9 @@ export class Model {
     @Column({ name:"description" })
     description: string;
 
+    @Column({ name:"type" })
+    type: string;
+
     @Column({name: "likes"})
     likes: number;
 
@@ -24,4 +28,8 @@ export class Model {
     
     @Column({name: "telegram_free"})
     telegramFree: string;
+
+    @OneToMany(type => Image, image => image.model, { cascade: true }) 
+    images: Image[]; 
+
 }
