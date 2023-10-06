@@ -1,0 +1,45 @@
+import * as Joi from 'joi';
+import { Request, Response, NextFunction } from "express";
+import { validateBody } from "../utils/validators/SchemaValidator";
+
+export const validateCreateModel = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void | Response> => {
+    const schema = Joi.object().keys({
+        username: Joi.string().required().messages({
+            "any.required": "o campo username é obrigatório",
+        }),
+        location: Joi.string().required().messages({
+            "any.required": "O campo location é obrigatório",
+        }),
+        description: Joi.string().required().messages({
+            "any.required": "O campo description é obrigatório",
+        }),
+        telegramVip: Joi.string().uri().required().messages({  
+            "any.required": "O campo telegramVip é obrigatório",
+            "string.uri": "O campo telegramVip deve ser uma URI válida"
+        }),
+        telegramFree: Joi.string().uri().required().messages({  
+            "any.required": "O campo telegramFree é obrigatório",
+            "string.uri": "O campo telegramFree deve ser uma URI válida"
+        }),
+        likes: Joi.number().required().messages({
+            "any.required": "O campo likes é obrigatório",
+        }),
+        // image: Joi.object().keys({
+        //     name: Joi.string().required().messages({
+        //         "any.required": "O campo name em image é obrigatório"
+        //     }),
+        //     base64: Joi.string().required().messages({
+        //         "any.required": "O campo base64 em image é obrigatório"
+        //     })
+        // }),
+    });
+    try {
+        await validateBody(req, next, schema);
+    } catch (error) {
+        return res.status(422).send(error);
+    }
+};
