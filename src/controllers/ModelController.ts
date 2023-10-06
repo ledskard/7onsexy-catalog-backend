@@ -25,4 +25,26 @@ export default class ModelController {
         }
     }
 
+    public async findAll(req: Request, res: Response): Promise<Response> {
+        try {
+            const { filter } = req.headers;
+            const modelService = new ModelService();
+            const model = await modelService.findAll(filter);
+            return res.status(200).json(model);
+        } catch (err) {
+            return ProcessError(res, err);
+        }
+    }
+
+    public async increaseLike(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id } = req.params;
+            const modelService = new ModelService();
+            const model = await modelService.increaseLike(id);
+            return res.status(200).json(model);
+        } catch (err) {
+            return ProcessError(res, err);
+        }
+    }
+
 }

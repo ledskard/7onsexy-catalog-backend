@@ -6,5 +6,8 @@ const userRouter = Router();
 const modelController = new ModelController();
 
 userRouter.post("/", validateCreateModel, modelController.create);
+userRouter.get("/:id", modelController.findById);
+userRouter.get("/all", modelController.findAll);
+userRouter.post("/:id", modelController.increaseLike)
 
 export default userRouter;
