@@ -3,7 +3,6 @@ import * as bcrypt from "bcrypt";
 import {deletePassword} from "../utils/functions/DeletePassword";
 import {User} from "../entities/User";
 import {ErrorMessage, ErrorStatus} from "../utils/constants/ErrorConstants";
-import { sendRecoveryPassEmail } from "../utils/email/EmailUtil";
 
 export default class AuthenticateService {
     private readonly userRepository: UserRepository;
