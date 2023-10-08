@@ -15,7 +15,6 @@ export default class ModelService {
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
-        console.log(data.images)
         try {
             await Promise.all(data.images.map(async (image) =>  {
                 if (image?.base64) {
@@ -33,11 +32,8 @@ export default class ModelService {
             const model = await this.modelRepository.create(data);
             return model;
         } catch (error) {
-            // Lide com o erro aqui
             throw error;
         }
-        // const model = await this.modelRepository.create(data);
-        // return model;
     }
 
     public async findById(userId: string): Promise<Model | undefined> {
@@ -46,6 +42,7 @@ export default class ModelService {
         return model;
     }
     public async findAll(type?: string): Promise<Model[]> {
+        console.log(type)
         const models = await this.modelRepository.findAll(type);
         return models;
     }

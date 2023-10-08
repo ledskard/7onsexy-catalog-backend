@@ -27,8 +27,9 @@ export const validateCreateModel = async (
         description: Joi.string().required().messages({
             "any.required": "O campo description é obrigatório",
         }),
-        type: Joi.string().required().messages({
+        type: Joi.string().valid('casais', 'mulheres', 'trans').required().messages({
             "any.required": "O campo type é obrigatório",
+            "any.only": "O campo type deve ser 'casais', 'mulheres' ou 'trans'",
         }),
         telegramVip: Joi.string().uri().required().messages({  
             "any.required": "O campo telegramVip é obrigatório",
