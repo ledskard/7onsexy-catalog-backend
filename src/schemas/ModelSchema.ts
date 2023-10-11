@@ -39,9 +39,8 @@ export const validateCreateModel = async (
             "any.required": "O campo telegramFree é obrigatório",
             "string.uri": "O campo telegramFree deve ser uma URI válida"
         }),
-        likes: Joi.number().required().messages({
-            "any.required": "O campo likes é obrigatório",
-        }),
+        likes: Joi.optional(),
+        profileImg: Joi.optional(),
         images: Joi.array().items(imageSchema).required().messages({
         "any.required": "O campo images é obrigatório"
     })

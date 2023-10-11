@@ -1,14 +1,17 @@
 import { ICreateModelDTO } from "../dtos/ModelDTO";
 import { Model } from "../entities/Model";
+import { ImageRepository } from "../repositories/ImageRepository";
 import { ModelRepository } from "../repositories/ModelRepository";
 import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
 import ImageService from "./ImageService";
 
 export default class ModelService {
     private readonly modelRepository: ModelRepository;
+    private readonly imageRepository: ImageRepository;
     private readonly imageService: ImageService;
     constructor() {
         this.modelRepository = new ModelRepository();
+        this.imageRepository = new ImageRepository();
         this.imageService = new ImageService();
     }
 
@@ -27,6 +30,19 @@ export default class ModelService {
                         throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
                     }
                 }
+        
+            if (data.profileImg?.base64) {
+                try {
+                    const profileImageResponse = await this.imageService.saveFile(data.profileImg);
+                    data.profileImg.url = profileImageResponse.imageUrl;
+                    data.profileImg.name = profileImageResponse.fileName;
+                    delete data.profileImg.base64;
+                    const savedImage = await this.imageRepository.create(data.profileImg)
+                    data.profileImageId = savedImage.id;
+                } catch (error) {
+                    throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                }
+            }
             }));
             
             const model = await this.modelRepository.create(data);
@@ -38,12 +54,18 @@ export default class ModelService {
 
     public async findById(userId: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findById(userId);
+        const profileImage = await this.imageRepository.findById(model.profileImageId)
+        model.profileImage = profileImage;
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
     public async findAll(type?: string): Promise<Model[]> {
-        console.log(type)
+        
         const models = await this.modelRepository.findAll(type);
+        for (const model of models) {
+            const profileImage = await this.imageRepository.findById(model.profileImageId)
+            model.profileImage = profileImage
+        }
         return models;
     }
 

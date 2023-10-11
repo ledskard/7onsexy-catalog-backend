@@ -8,7 +8,11 @@ export class ImageRepository {
     constructor() {
         this.imageRepository = AppDataSource.getRepository(Image);
     }
-
+    public async create(data: Image): Promise<Image> {
+        const model = await this.imageRepository.create(data);
+        await this.imageRepository.save(model);
+        return model;
+    }
     public async findById(id: string): Promise<Image | undefined> {
         const image = await this.imageRepository
         .createQueryBuilder("image")

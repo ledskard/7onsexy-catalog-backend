@@ -29,7 +29,11 @@ export class Model {
     @Column({name: "telegram_free"})
     telegramFree: string;
 
+    @Column({ name: "profile_image_id", nullable:true })
+    profileImageId: string;
+    
     @OneToMany(type => Image, image => image.model, { cascade: true }) 
     images: Image[]; 
 
+    profileImage?: Image;
 }

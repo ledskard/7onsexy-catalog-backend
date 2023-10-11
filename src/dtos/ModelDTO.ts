@@ -7,5 +7,7 @@ export interface ICreateModelDTO {
     likes: number;
     telegramVip: string;
     telegramFree: string;
-    images: Image[]
+    images: Image[];
+    profileImg: Image;
+    profileImageId?: string;
 }
