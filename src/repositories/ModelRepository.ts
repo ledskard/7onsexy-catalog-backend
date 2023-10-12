@@ -25,14 +25,15 @@ export class ModelRepository {
             .getOne();
         return model;
     }
+
     public async findAll(type: string): Promise<Model[]> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
+            .leftJoinAndSelect("m.profileImage","mp")
             .leftJoinAndSelect("m.images", "mi")
         if(type) {
             model.andWhere("m.type = :type", {type})
         }
-            
         return model.getMany();;
     }
     public async findByUsername(username: string): Promise<Model | undefined> {
