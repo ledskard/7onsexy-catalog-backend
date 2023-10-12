@@ -20,6 +20,7 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.profileImage", "mp")
             .where("m.id = :id", {id})
             .getOne();
         return model;
