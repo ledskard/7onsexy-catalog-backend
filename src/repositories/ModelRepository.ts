@@ -20,7 +20,6 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.profileImage", "mp")
             .where("m.id = :id", {id})
             .getOne();
         return model;
@@ -29,7 +28,6 @@ export class ModelRepository {
     public async findAll(type: string): Promise<Model[]> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
-            .leftJoinAndSelect("m.profileImage","mp")
             .leftJoinAndSelect("m.images", "mi")
         if(type) {
             model.andWhere("m.type = :type", {type})

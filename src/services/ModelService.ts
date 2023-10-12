@@ -66,6 +66,7 @@ export default class ModelService {
             const profileImage = await this.imageRepository.findById(model.profileImageId)
             model.profileImage = profileImage
         }
+        console.log(models)
         return models;
     }
 
