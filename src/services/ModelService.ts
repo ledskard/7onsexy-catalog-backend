@@ -79,6 +79,8 @@ export default class ModelService {
     }
 
     public async delete(id:string): Promise<any> {
+        const images = await this.imageRepository.findByModelId(id);
+        images.forEach(async image => await this.imageService.deleteFromS3(image))
         return await this.modelRepository.delete(id)
     }
 }

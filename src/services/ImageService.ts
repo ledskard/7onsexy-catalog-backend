@@ -7,11 +7,14 @@ import {
 } from "@aws-sdk/client-s3";
 import { Image } from "../entities/Image";
 import { IReturnImageDTO } from "../dtos/ImageDTO";
+import { ImageRepository } from "../repositories/ImageRepository";
 
 export default class ImageService {
-  private client: S3Client;
+  private readonly client: S3Client;
+  private readonly imageRepository: ImageRepository;
 
   constructor() {
+    this.imageRepository = new ImageRepository();
     const s3Config: S3ClientConfig = {
       region: process.env.AWS_REGION,
       credentials: {
@@ -73,12 +76,13 @@ export default class ImageService {
     }
   }
 
-  public async deleteFromS3(fileName: string): Promise<void> {
+  public async deleteFromS3(image: Image): Promise<void> { 
+    
+    await this.imageRepository.deleteById(image.id);
     const params = {
       Bucket: "xbio",
-      Key: fileName,
+      Key: image.name,
     };
-
     try {
       const response = await this.client.send(new DeleteObjectCommand(params));
       // console.log("Arquivo deletado com sucesso: ", response);

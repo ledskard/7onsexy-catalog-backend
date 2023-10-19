@@ -21,6 +21,15 @@ export class ImageRepository {
 
         return image;
     }
+    public async findByModelId(id: string): Promise<Image[] | undefined> {
+        const image = await this.imageRepository
+        .createQueryBuilder("i")
+        .leftJoinAndSelect("i.model", "im")
+        .where("im.id = :id", { id })
+        .getMany();
+
+        return image;
+    }
 
     public async save(data: Image): Promise<Image> {
         return await this.imageRepository.save(data);
