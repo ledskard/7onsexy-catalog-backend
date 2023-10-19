@@ -46,5 +46,8 @@ export class ModelRepository {
     public async save(data: Model): Promise<Model> {
         return await this.modelRepository.save(data);
     }
+    public async delete(id: string): Promise<any> {
+        return await this.modelRepository.delete(id)
+    }
     
 }

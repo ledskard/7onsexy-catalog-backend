@@ -47,5 +47,14 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
-
+    public async delete(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id } = req.params;
+            const modelService = new ModelService();
+            const model = await modelService.delete(id);
+            return res.status(200).json(model);
+        } catch (err) {
+            return ProcessError(res, err);
+        }
+    }
 }

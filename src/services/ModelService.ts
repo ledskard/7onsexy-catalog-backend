@@ -78,4 +78,7 @@ export default class ModelService {
         return userUpdated;
     }
 
+    public async delete(id:string): Promise<any> {
+        return await this.modelRepository.delete(id)
+    }
 }
