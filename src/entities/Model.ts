@@ -32,7 +32,7 @@ export class Model {
     @Column({ name: "profile_image_id", nullable:true })
     profileImageId: string;
     
-    @OneToMany(type => Image, image => image.model, { cascade: true }) 
+    @OneToMany(type => Image, image => image.model) 
     images: Image[]; 
 
     profileImage?: Image;
