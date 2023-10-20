@@ -21,8 +21,8 @@ export const validateCreateModel = async (
         username: Joi.string().required().messages({
             "any.required": "o campo username é obrigatório",
         }),
-        location: Joi.string().required().messages({
-            "any.required": "O campo location é obrigatório",
+        instagram: Joi.string().required().messages({
+            "any.required": "O campo instagram é obrigatório",
         }),
         description: Joi.string().required().messages({
             "any.required": "O campo description é obrigatório",

@@ -11,8 +11,8 @@ export class Model {
     @Column({ name:"username", unique:true })
     username: string;
 
-    @Column({ name:"location" })
-    location: string;
+    @Column({ name:"instagram" })
+    instagram: string;
 
     @Column({ name:"description" })
     description: string;
