@@ -7,7 +7,7 @@ const modelRouter = Router();
 const modelController = new ModelController();
 const authMiddleware = new AuthMiddleware();
 
-modelRouter.post("/", authMiddleware.auth,validateCreateModel, modelController.create);
+modelRouter.post("/",validateCreateModel, modelController.create);
 modelRouter.get("/:id", modelController.findById);
 modelRouter.get("/", modelController.findAll);
 modelRouter.post("/:id", modelController.increaseLike);
