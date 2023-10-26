@@ -18,38 +18,8 @@ export default class ModelService {
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
-        try {
-            await Promise.all(data.images.map(async (image) =>  {
-                if (image?.base64) {
-                    try {
-                        const imageResponse = await this.imageService.saveFile(image);
-                        image.url = imageResponse.imageUrl;
-                        image.name = imageResponse.fileName;
-                        delete image.base64;
-                    } catch (error) {
-                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
-                    }
-                }
-        
-            if (data.profileImg?.base64) {
-                try {
-                    const profileImageResponse = await this.imageService.saveFile(data.profileImg);
-                    data.profileImg.url = profileImageResponse.imageUrl;
-                    data.profileImg.name = profileImageResponse.fileName;
-                    delete data.profileImg.base64;
-                    const savedImage = await this.imageRepository.create(data.profileImg)
-                    data.profileImageId = savedImage.id;
-                } catch (error) {
-                    throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
-                }
-            }
-            }));
-            
-            const model = await this.modelRepository.create(data);
-            return model;
-        } catch (error) {
-            throw error;
-        }
+        const model = await this.modelRepository.create(data);
+        return model;
     }
 
     public async findById(userId: string): Promise<Model | undefined> {
@@ -59,14 +29,24 @@ export default class ModelService {
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
+
+    public async update(id:string, data: any): Promise<Model | undefined> {
+        const model = await this.modelRepository.findById(id);
+        if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+
+
+        const modelToBeUpdated = Object.assign(model, data);
+        const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+        return modelUpdated;
+    }
+
+
     public async findAll(type?: string): Promise<Model[]> {
-        
         const models = await this.modelRepository.findAll(type);
-        for (const model of models) {
-            const profileImage = await this.imageRepository.findById(model.profileImageId)
-            model.profileImage = profileImage
-        }
-        console.log(models)
+        // for (const model of models) {
+        //     const profileImage = await this.imageRepository.findById(model.profileImageId)
+        //     model.profileImage = profileImage
+        // }
         return models;
     }
 

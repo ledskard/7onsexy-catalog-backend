@@ -8,6 +8,5 @@ export interface ICreateModelDTO {
     instagram: string;
     telegramFree: string;
     images: Image[];
-    profileImg: Image;
     profileImageId?: string;
 }

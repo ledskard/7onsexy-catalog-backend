@@ -15,8 +15,8 @@ export class Image {
 
     base64?: string;
 
-    @ManyToOne(type => Model, model => model.images, { onDelete: "CASCADE" }) 
+    @ManyToOne(type => Model, model => model.images, { onDelete: "CASCADE", nullable: true }) 
     @JoinColumn({ name: "model_id" }) 
-    model: Model;
+    model?: Model;
 
 }
