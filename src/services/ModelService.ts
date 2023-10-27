@@ -59,6 +59,64 @@ export default class ModelService {
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
+   
+    public async update(id: string, data: any): Promise<Model | undefined> {
+        const model = await this.modelRepository.findById(id);
+        if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+    
+        let oldProfileImageId = null;
+        let oldProfileImageName = null; 
+
+        let oldImages = [];
+               
+        await Promise.all(data.images.map(async (image) =>  {
+            if (image?.base64) {
+                try {
+                    const imageResponse = await this.imageService.saveFile(image);
+                    image.url = imageResponse.imageUrl;
+                    image.name = imageResponse.fileName;
+                    delete image.base64;
+                } catch (error) {
+                    throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                }
+            }
+    
+        if (data.profileImg?.base64) {
+            try {
+                if (model.profileImageId) {
+                    const profileImage = await this.imageRepository.findById(model.profileImageId);
+                    oldProfileImageId = profileImage.id;
+                    oldProfileImageName = profileImage.name;
+                }
+                const profileImageResponse = await this.imageService.saveFile(data.profileImg);
+                data.profileImg.url = profileImageResponse.imageUrl;
+                data.profileImg.name = profileImageResponse.fileName;
+                delete data.profileImg.base64;
+                const savedImage = await this.imageRepository.create(data.profileImg)
+                data.profileImageId = savedImage.id;
+            } catch (error) {
+                throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+            }
+        }
+        }));
+        
+        const modelToBeUpdated = Object.assign(model, data);
+        const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+    
+        if (oldProfileImageId && oldProfileImageName) {
+            await this.imageService.deleteFromS3({id: oldProfileImageId, name: oldProfileImageName});
+        }
+        if (oldImages.length > 0){
+            for (const image of oldImages) {
+                if(image.id && image.name){
+                    await this.imageService.deleteFromS3(image.name);
+                }
+            }        
+        }
+        
+        return modelUpdated;
+    }
+    
     public async findAll(type?: string): Promise<Model[]> {
         
         const models = await this.modelRepository.findAll(type);

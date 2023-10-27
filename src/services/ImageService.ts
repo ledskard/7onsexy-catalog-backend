@@ -6,7 +6,7 @@ import {
   S3ClientConfig,
 } from "@aws-sdk/client-s3";
 import { Image } from "../entities/Image";
-import { IReturnImageDTO } from "../dtos/ImageDTO";
+import { IDeleteImageDTO, IReturnImageDTO } from "../dtos/ImageDTO";
 import { ImageRepository } from "../repositories/ImageRepository";
 
 export default class ImageService {
@@ -76,7 +76,7 @@ export default class ImageService {
     }
   }
 
-  public async deleteFromS3(image: Image): Promise<void> { 
+  public async deleteFromS3(image: IDeleteImageDTO): Promise<void> { 
     
     await this.imageRepository.deleteById(image.id);
     const params = {

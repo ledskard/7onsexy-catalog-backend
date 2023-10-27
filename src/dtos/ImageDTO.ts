@@ -3,3 +3,8 @@ export interface IReturnImageDTO {
     fileName: string;
 }
 
+export interface IDeleteImageDTO {
+    id?:string,
+    name: string,
+    url?:string
+}
