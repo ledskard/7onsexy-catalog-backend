@@ -9,7 +9,6 @@ const authMiddleware = new Auth();
 routes.use("/users", userRouter);
 routes.use("/models", modelRouter)
 routes.get("/", (req, res)=> {
-    console.log('sim')
     res.status(200).send({status: "ok"})
 })
 
