@@ -20,14 +20,20 @@ export class Model {
     @Column({ name:"type" })
     type: string;
 
-    @Column({name: "likes"})
+    @Column({ name: "likes" })
     likes: number;
 
-    @Column({name: "telegram_vip"})
+    @Column({ name: "telegram_vip" })
     telegramVip: string;
     
-    @Column({name: "telegram_free"})
+    @Column({ name: "telegram_free" })
     telegramFree: string;
+
+    @Column({ name: "tiktok", nullable: true  })
+    tiktok: string;
+
+    @Column({ name: "twitter", nullable: true  })
+    twitter: string;
 
     @Column({ name: "profile_image_id", nullable:true })
     profileImageId: string;
