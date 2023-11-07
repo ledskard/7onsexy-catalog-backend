@@ -20,6 +20,7 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons","mb")
             .where("m.id = :id", {id})
             .getOne();
         return model;
@@ -29,6 +30,7 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons","mb")
         if(type) {
             model.andWhere("m.type = :type", {type})
         }
