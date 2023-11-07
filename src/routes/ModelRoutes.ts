@@ -13,4 +13,5 @@ modelRouter.put("/:id", authMiddleware.auth, modelController.update);
 modelRouter.get("/", modelController.findAll);
 modelRouter.post("/:id", modelController.increaseLike);
 modelRouter.delete("/:id", modelController.delete);
+
 export default modelRouter;

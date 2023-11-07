@@ -1,5 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinTable, ManyToMany } from "typeorm";
 import { Image } from "./Image";
+import { FeatureFlags } from "./FeatureFlags";
 
 
 @Entity("model")
@@ -40,6 +41,21 @@ export class Model {
     
     @OneToMany(type => Image, image => image.model, { cascade: true }) 
     images: Image[]; 
+
+    @ManyToMany(() => FeatureFlags, featureFlag => featureFlag.models, { cascade: true })
+    @JoinTable({
+        name: "user_feature_flags", 
+        joinColumn: {
+            name: "user_id",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "feature_flag_id",
+            referencedColumnName: "id"
+        }
+    })
+    featureFlags?: FeatureFlags[] | string[];
+
 
     profileImage?: Image;
 }
