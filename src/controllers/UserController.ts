@@ -19,7 +19,6 @@ export default class UserController {
             const { username } = req.params;
             const userService = new UserService();
             const user = await userService.findByUsername(username);
-            console.log(user)
             return res.status(200).json(user);
         } catch (err) {
             return ProcessError(res, err);

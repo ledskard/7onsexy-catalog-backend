@@ -68,7 +68,7 @@ export default class ModelService {
         let oldProfileImageName = null; 
 
         let oldImages = [];
-               
+        if(data.images)
         await Promise.all(data.images.map(async (image) =>  {
             if (image?.base64) {
                 try {
@@ -124,7 +124,6 @@ export default class ModelService {
             const profileImage = await this.imageRepository.findById(model.profileImageId)
             model.profileImage = profileImage
         }
-        console.log(models)
         return models;
     }
 
