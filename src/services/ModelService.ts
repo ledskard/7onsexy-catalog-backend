@@ -117,9 +117,9 @@ export default class ModelService {
         return modelUpdated;
     }
     
-    public async findAll(type?: string): Promise<Model[]> {
+    public async findAll(type?: string, page?: number): Promise<Model[]> {
         
-        const models = await this.modelRepository.findAll(type);
+        const models = await this.modelRepository.findAll(type, page);
         for (const model of models) {
             const profileImage = await this.imageRepository.findById(model.profileImageId)
             model.profileImage = profileImage

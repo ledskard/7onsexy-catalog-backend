@@ -20,39 +20,47 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons","mb")
+            .leftJoinAndSelect("m.buttons", "mb")
             .leftJoinAndSelect("m.featureFlags", "mf")
-            .where("m.id = :id", {id})
+            .where("m.id = :id", { id })
             .getOne();
         return model;
     }
-
-    public async findAll(type: string): Promise<Model[]> {
+    public async findAll(type: string, page: number = 1): Promise<Model[]> {
+        const pageSize: number = 40
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons","mb")
-            .leftJoinAndSelect("m.featureFlags", "mf")
-        if(type) {
-            model.andWhere("m.type = :type", {type})
+            .leftJoinAndSelect("m.buttons", "mb")
+            .leftJoinAndSelect("m.featureFlags", "mf");
+
+        if (type) {
+            model.andWhere("m.type = :type", { type });
         }
-        return model.getMany();;
+
+        const offset = (page - 1) * pageSize;
+
+        return model
+            .skip(offset)
+            .take(pageSize)
+            .getMany();
     }
+
     public async findByUsername(username: string): Promise<Model | undefined> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            
-            .where("m.username = :username", {username})
+
+            .where("m.username = :username", { username })
             .getOne();
         return model;
     }
-    
+
     public async save(data: Model): Promise<Model> {
         return await this.modelRepository.save(data);
     }
     public async delete(id: string): Promise<any> {
         return await this.modelRepository.delete(id)
     }
-    
+
 }
