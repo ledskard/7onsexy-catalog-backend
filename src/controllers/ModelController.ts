@@ -34,14 +34,12 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
-
-    public async findAll(req: Request, res: Response): Promise<Response> {
+        public async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const { type, page } = req.query
+            const { type } = req.query
             const modelService = new ModelService();
             const typeString = type ? type.toString() : null;
-            const pageNumber = page ? Number(page) : null;
-            const model = await modelService.findAll(typeString, pageNumber);
+            const model = await modelService.findAll(typeString);
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);

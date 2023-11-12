@@ -26,24 +26,16 @@ export class ModelRepository {
             .getOne();
         return model;
     }
-    public async findAll(type: string, page: number = 1): Promise<Model[]> {
-        const pageSize: number = 40
+    public async findAll(type: string): Promise<Model[]> {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons", "mb")
-            .leftJoinAndSelect("m.featureFlags", "mf");
-
-        if (type) {
-            model.andWhere("m.type = :type", { type });
+            .leftJoinAndSelect("m.buttons","mb")
+            .leftJoinAndSelect("m.featureFlags", "mf")
+        if(type) {
+            model.andWhere("m.type = :type", {type})
         }
-
-        const offset = (page - 1) * pageSize;
-
-        return model
-            .skip(offset)
-            .take(pageSize)
-            .getMany();
+        return model.getMany();
     }
 
     public async findByUsername(username: string): Promise<Model | undefined> {
