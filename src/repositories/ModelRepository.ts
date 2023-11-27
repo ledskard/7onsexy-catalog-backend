@@ -42,7 +42,7 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .where("REPLACE(m.username, ' ', '') = :username", { username })
+            .where("m.username = :username", { username })
             .getOne();
         return model;
     }
