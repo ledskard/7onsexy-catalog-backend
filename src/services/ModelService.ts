@@ -53,15 +53,15 @@ export default class ModelService {
     }
 
     public async findById(userId: string): Promise<Model | undefined> {
-        const model = await this.modelRepository.findById(userId);
+        const model = await this.modelRepository.findByUsername(userId);
         const profileImage = await this.imageRepository.findById(model.profileImageId)
         model.profileImage = profileImage;
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
    
-    public async update(id: string, data: any): Promise<Model | undefined> {
-        const model = await this.modelRepository.findById(id);
+    public async update(username: string, data: any): Promise<Model | undefined> {
+        const model = await this.modelRepository.findByUsername(username);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
     
         let oldProfileImageId = null;
@@ -127,17 +127,18 @@ export default class ModelService {
         return models;
     }
 
-    public async increaseLike(userId: string): Promise<Model | undefined> {
-        const model = await this.modelRepository.findById(userId);
+    public async increaseLike(username: string): Promise<Model | undefined> {
+        const model = await this.modelRepository.findByUsername(username);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         const userToBeUpdated = Object.assign(model, {likes: model.likes + 1});
         let userUpdated = await this.modelRepository.save(userToBeUpdated);
         return userUpdated;
     }
 
-    public async delete(id:string): Promise<any> {
-        const images = await this.imageRepository.findByModelId(id);
+    public async delete(username: string): Promise<any> {
+        const model = await this.modelRepository.findByUsername(username)
+        const images = await this.imageRepository.findByModelId(username);
         images.forEach(async image => await this.imageService.deleteFromS3(image))
-        return await this.modelRepository.delete(id)
+        return await this.modelRepository.delete(model.id)
     }
 }

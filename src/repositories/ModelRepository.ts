@@ -30,10 +30,10 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons","mb")
+            .leftJoinAndSelect("m.buttons", "mb")
             .leftJoinAndSelect("m.featureFlags", "mf")
-        if(type) {
-            model.andWhere("m.type = :type", {type})
+        if (type) {
+            model.andWhere("m.type = :type", { type })
         }
         return model.getMany();
     }
@@ -42,8 +42,7 @@ export class ModelRepository {
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-
-            .where("m.username = :username", { username })
+            .where("REPLACE(m.username, ' ', '') = :username", { username })
             .getOne();
         return model;
     }
