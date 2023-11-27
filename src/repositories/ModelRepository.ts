@@ -39,10 +39,11 @@ export class ModelRepository {
     }
 
     public async findByUsername(username: string): Promise<Model | undefined> {
+        console.log(username)
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
-            .where("m.username = :username", { username })
+            .where("REPLACE(m.username, ' ', '') = :username", { username })
             .getOne();
         return model;
     }
