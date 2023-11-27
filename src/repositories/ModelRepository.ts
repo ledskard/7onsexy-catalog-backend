@@ -39,12 +39,13 @@ export class ModelRepository {
     }
 
     public async findByUsername(username: string): Promise<Model | undefined> {
-        console.log(username)
         const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons", "mb")
+            .leftJoinAndSelect("m.featureFlags", "mf")
             .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername })
             .getOne();
         return model;
