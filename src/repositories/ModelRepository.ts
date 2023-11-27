@@ -22,7 +22,7 @@ export class ModelRepository {
             .leftJoinAndSelect("m.images", "mi")
             .leftJoinAndSelect("m.buttons", "mb")
             .leftJoinAndSelect("m.featureFlags", "mf")
-            .where("m.id = :id", { id })
+            .where("m.username = :id", { id })
             .getOne();
         return model;
     }
