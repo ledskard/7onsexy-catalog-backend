@@ -67,7 +67,9 @@ var ModelRepository = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.modelRepository
                             .createQueryBuilder("m")
                             .leftJoinAndSelect("m.images", "mi")
-                            .where("m.id = :id", { id: id })
+                            .leftJoinAndSelect("m.buttons", "mb")
+                            .leftJoinAndSelect("m.featureFlags", "mf")
+                            .where("m.username = :id", { id: id })
                             .getOne()];
                     case 1:
                         model = _a.sent();
@@ -83,7 +85,9 @@ var ModelRepository = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository
                             .createQueryBuilder("m")
-                            .leftJoinAndSelect("m.images", "mi")];
+                            .leftJoinAndSelect("m.images", "mi")
+                            .leftJoinAndSelect("m.buttons", "mb")
+                            .leftJoinAndSelect("m.featureFlags", "mf")];
                     case 1:
                         model = _a.sent();
                         if (type) {
@@ -96,14 +100,18 @@ var ModelRepository = /** @class */ (function () {
     };
     ModelRepository.prototype.findByUsername = function (username) {
         return __awaiter(this, void 0, void 0, function () {
-            var model;
+            var cleanedUsername, model;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.modelRepository
-                            .createQueryBuilder("m")
-                            .leftJoinAndSelect("m.images", "mi")
-                            .where("m.username = :username", { username: username })
-                            .getOne()];
+                    case 0:
+                        cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
+                        return [4 /*yield*/, this.modelRepository
+                                .createQueryBuilder("m")
+                                .leftJoinAndSelect("m.images", "mi")
+                                .leftJoinAndSelect("m.buttons", "mb")
+                                .leftJoinAndSelect("m.featureFlags", "mf")
+                                .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername })
+                                .getOne()];
                     case 1:
                         model = _a.sent();
                         return [2 /*return*/, model];
@@ -116,6 +124,16 @@ var ModelRepository = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.modelRepository.save(data)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    ModelRepository.prototype.delete = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.modelRepository.delete(id)];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });

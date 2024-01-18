@@ -56,26 +56,24 @@ var validateCreateModel = function (req, res, next) { return __awaiter(void 0, v
                     username: Joi.string().required().messages({
                         "any.required": "o campo username é obrigatório",
                     }),
-                    location: Joi.string().required().messages({
-                        "any.required": "O campo location é obrigatório",
-                    }),
-                    description: Joi.string().required().messages({
-                        "any.required": "O campo description é obrigatório",
-                    }),
-                    type: Joi.string().required().messages({
+                    instagram: Joi.optional(),
+                    tiktok: Joi.optional(),
+                    twitter: Joi.optional(),
+                    description: Joi.optional(),
+                    type: Joi.string().valid('casais', 'mulheres', 'trans', 'homens').required().messages({
                         "any.required": "O campo type é obrigatório",
+                        "any.only": "O campo type deve ser 'casais', 'mulheres' ou 'trans' ou homens",
                     }),
-                    telegramVip: Joi.string().uri().required().messages({
+                    telegramVip: Joi.string().required().messages({
                         "any.required": "O campo telegramVip é obrigatório",
                         "string.uri": "O campo telegramVip deve ser uma URI válida"
                     }),
-                    telegramFree: Joi.string().uri().required().messages({
+                    telegramFree: Joi.string().required().messages({
                         "any.required": "O campo telegramFree é obrigatório",
                         "string.uri": "O campo telegramFree deve ser uma URI válida"
                     }),
-                    likes: Joi.number().required().messages({
-                        "any.required": "O campo likes é obrigatório",
-                    }),
+                    likes: Joi.optional(),
+                    profileImg: Joi.optional(),
                     images: Joi.array().items(imageSchema).required().messages({
                         "any.required": "O campo images é obrigatório"
                     })

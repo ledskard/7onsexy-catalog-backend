@@ -73,7 +73,6 @@ var UserController = /** @class */ (function () {
                         return [4 /*yield*/, userService.findByUsername(username)];
                     case 1:
                         user = _a.sent();
-                        console.log(user);
                         return [2 /*return*/, res.status(200).json(user)];
                     case 2:
                         err_2 = _a.sent();

@@ -38,8 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv").config();
 var client_s3_1 = require("@aws-sdk/client-s3");
+var ImageRepository_1 = require("../repositories/ImageRepository");
 var ImageService = /** @class */ (function () {
     function ImageService() {
+        this.imageRepository = new ImageRepository_1.ImageRepository();
         var s3Config = {
             region: process.env.AWS_REGION,
             credentials: {
@@ -99,27 +101,29 @@ var ImageService = /** @class */ (function () {
             });
         });
     };
-    ImageService.prototype.deleteFromS3 = function (fileName) {
+    ImageService.prototype.deleteFromS3 = function (image) {
         return __awaiter(this, void 0, void 0, function () {
             var params, response, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
+                    case 0: return [4 /*yield*/, this.imageRepository.deleteById(image.id)];
+                    case 1:
+                        _a.sent();
                         params = {
                             Bucket: "xbio",
-                            Key: fileName,
+                            Key: image.name,
                         };
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.client.send(new client_s3_1.DeleteObjectCommand(params))];
+                        _a.label = 2;
                     case 2:
-                        response = _a.sent();
-                        return [3 /*break*/, 4];
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, this.client.send(new client_s3_1.DeleteObjectCommand(params))];
                     case 3:
+                        response = _a.sent();
+                        return [3 /*break*/, 5];
+                    case 4:
                         error_2 = _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });

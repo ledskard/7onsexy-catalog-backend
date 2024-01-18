@@ -43,6 +43,22 @@ var ImageRepository = /** @class */ (function () {
     function ImageRepository() {
         this.imageRepository = data_source_1.AppDataSource.getRepository(Image_1.Image);
     }
+    ImageRepository.prototype.create = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var model;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.imageRepository.create(data)];
+                    case 1:
+                        model = _a.sent();
+                        return [4 /*yield*/, this.imageRepository.save(model)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, model];
+                }
+            });
+        });
+    };
     ImageRepository.prototype.findById = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var image;
@@ -52,6 +68,23 @@ var ImageRepository = /** @class */ (function () {
                             .createQueryBuilder("image")
                             .where("image.id = :id", { id: id })
                             .getOne()];
+                    case 1:
+                        image = _a.sent();
+                        return [2 /*return*/, image];
+                }
+            });
+        });
+    };
+    ImageRepository.prototype.findByModelId = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var image;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.imageRepository
+                            .createQueryBuilder("i")
+                            .leftJoinAndSelect("i.model", "im")
+                            .where("im.id = :id", { id: id })
+                            .getMany()];
                     case 1:
                         image = _a.sent();
                         return [2 /*return*/, image];

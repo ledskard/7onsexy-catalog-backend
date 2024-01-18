@@ -28,7 +28,7 @@ var Image = /** @class */ (function () {
         __metadata("design:type", String)
     ], Image.prototype, "name", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function (type) { return Model_1.Model; }, function (model) { return model.images; }),
+        (0, typeorm_1.ManyToOne)(function (type) { return Model_1.Model; }, function (model) { return model.images; }, { onDelete: "CASCADE" }),
         (0, typeorm_1.JoinColumn)({ name: "model_id" }),
         __metadata("design:type", Model_1.Model)
     ], Image.prototype, "model", void 0);

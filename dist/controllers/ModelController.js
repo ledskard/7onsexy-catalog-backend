@@ -82,9 +82,30 @@ var ModelController = /** @class */ (function () {
             });
         });
     };
+    ModelController.prototype.update = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, modelService, model, err_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        id = req.params.id;
+                        modelService = new ModelService_1.default();
+                        return [4 /*yield*/, modelService.update(id, req.body)];
+                    case 1:
+                        model = _a.sent();
+                        return [2 /*return*/, res.status(200).json(model)];
+                    case 2:
+                        err_3 = _a.sent();
+                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_3)];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     ModelController.prototype.findAll = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var type, modelService, typeString, model, err_3;
+            var type, modelService, typeString, model, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -97,8 +118,8 @@ var ModelController = /** @class */ (function () {
                         model = _a.sent();
                         return [2 /*return*/, res.status(200).json(model)];
                     case 2:
-                        err_3 = _a.sent();
-                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_3)];
+                        err_4 = _a.sent();
+                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_4)];
                     case 3: return [2 /*return*/];
                 }
             });
@@ -106,7 +127,7 @@ var ModelController = /** @class */ (function () {
     };
     ModelController.prototype.increaseLike = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, modelService, model, err_4;
+            var id, modelService, model, err_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -118,8 +139,29 @@ var ModelController = /** @class */ (function () {
                         model = _a.sent();
                         return [2 /*return*/, res.status(200).json(model)];
                     case 2:
-                        err_4 = _a.sent();
-                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_4)];
+                        err_5 = _a.sent();
+                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_5)];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ModelController.prototype.delete = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, modelService, model, err_6;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        id = req.params.id;
+                        modelService = new ModelService_1.default();
+                        return [4 /*yield*/, modelService.delete(id)];
+                    case 1:
+                        model = _a.sent();
+                        return [2 /*return*/, res.status(200).json(model)];
+                    case 2:
+                        err_6 = _a.sent();
+                        return [2 /*return*/, (0, ProcessError_1.ProcessError)(res, err_6)];
                     case 3: return [2 /*return*/];
                 }
             });
