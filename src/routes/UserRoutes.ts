@@ -11,5 +11,4 @@ const authMiddleware = new AuthMiddleware();
 
 userRouter.post("/", validateCreateUser, userController.create);
 userRouter.post("/login", validateAuthenticateUser, authenticateController.authenticate);
-userRouter.post("/pass", userController.changeUserPass)
 export default userRouter;
