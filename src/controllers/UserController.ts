@@ -14,6 +14,7 @@ export default class UserController {
         }
     }
 
+    
     public async findByUsername(req: Request, res: Response): Promise<Response> {
         try {
             const { username } = req.params;
@@ -30,6 +31,15 @@ export default class UserController {
             const { authorization } = req.headers;
             const userService = new UserService();
             const user = await userService.update(authorization, req.body);
+            return res.status(200).json(user);
+        } catch (err) {
+            return ProcessError(res, err);
+        }
+    }
+    public async changeUserPass(req: Request, res: Response): Promise<Response> {
+        try {
+            const userService = new UserService();
+            const user = await userService.changeUserPass(req.body.username, req.body.password);
             return res.status(200).json(user);
         } catch (err) {
             return ProcessError(res, err);

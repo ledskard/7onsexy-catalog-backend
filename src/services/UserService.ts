@@ -44,6 +44,16 @@ export default class UserService {
         deletePassword(userUpdated);
         return userUpdated;
     }
+    public async changeUserPass(username: string, password: string): Promise<User | undefined> {
+        const user = await this.userRepository.findByUsername("admin");
+        if (!user) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+        
+        const userToBeUpdated = Object.assign(user, { username, password });
+        let userUpdated = await this.userRepository.save(userToBeUpdated);
+        
+        deletePassword(userUpdated);
+        return userUpdated;
+    }
 
     private async decodeToken(authorization: string): Promise<string>{
         const token = authorization.replace("Bearer ", "").trim();
