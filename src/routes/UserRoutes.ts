@@ -9,6 +9,5 @@ const userController = new UserController();
 const authenticateController = new AuthenticateController();
 const authMiddleware = new AuthMiddleware();
 
-userRouter.post("/", validateCreateUser, userController.create);
 userRouter.post("/login", validateAuthenticateUser, authenticateController.authenticate);
 export default userRouter;
