@@ -10,19 +10,19 @@ export class Model {
     @PrimaryGeneratedColumn({ name: "id" })
     id: string;
 
-    @Column({ name:"username", unique:true })
+    @Column({ name: "username", unique:true })
     username: string;
     
-    @Column({ name:"email", nullable: true})
+    @Column({ name: "email", nullable: true })
     email: string;
 
-    @Column({ name:"instagram", nullable: true })
+    @Column({ name: "instagram", nullable: true })
     instagram: string;
 
-    @Column({ name:"description" })
+    @Column({ name: "description" })
     description: string;
 
-    @Column({ name:"type" })
+    @Column({ name: "type" })
     type: string;
 
     @Column({ name: "likes" })

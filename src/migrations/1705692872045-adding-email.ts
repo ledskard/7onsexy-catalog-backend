@@ -8,7 +8,7 @@ export class AddingEmail1705692872045 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`model\` DROP INDEX \`IDX_0049b8eed7227e82c98220525f\``);
+        await queryRunner.query(`ALTER TABLE \`model\` DROP COLUMN \`email\``);
     }
 
 }
