@@ -12,6 +12,9 @@ export class Model {
 
     @Column({ name:"username", unique:true })
     username: string;
+    
+    @Column({ name:"email", unique:true })
+    email: string;
 
     @Column({ name:"instagram", nullable: true })
     instagram: string;

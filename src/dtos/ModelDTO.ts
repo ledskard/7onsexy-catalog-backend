@@ -9,5 +9,6 @@ export interface ICreateModelDTO {
     telegramFree: string;
     images: Image[];
     profileImg: Image;
+    email:string;
     profileImageId?: string;
 }

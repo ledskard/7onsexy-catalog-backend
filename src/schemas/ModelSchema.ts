@@ -7,7 +7,6 @@ export const validateCreateModel = async (
     res: Response,
     next: NextFunction
 ): Promise<void | Response> => {
-
     const imageSchema = Joi.object().keys({
         name: Joi.string().required().messages({
             "any.required": "O campo name em image é obrigatório"
@@ -21,6 +20,7 @@ export const validateCreateModel = async (
         username: Joi.string().required().messages({
             "any.required": "o campo username é obrigatório",
         }),
+        email: Joi.optional(),
         instagram: Joi.optional(),
         tiktok: Joi.optional(),
         twitter: Joi.optional(),

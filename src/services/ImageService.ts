@@ -23,11 +23,6 @@ export default class ImageService {
       },
     };
 
-    if (process.env.APP_ENV === "local") {
-      s3Config.endpoint = "http://localstack_xbio:4566";
-      s3Config.forcePathStyle = true;
-    }
-
     this.client = new S3Client(s3Config);
   }
 
