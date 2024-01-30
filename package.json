@@ -40,6 +40,6 @@
       "build": "tsc && cp .env ./dist",
       "typeorm": "typeorm-ts-node-commonjs",
       "test": "jest",
-      "migrate": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run"
+      "migrate": "typeorm-ts-node-commonjs -d ./src/infra/data-sources/index.ts  migration:run"
    }
 }
