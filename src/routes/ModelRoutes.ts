@@ -9,9 +9,9 @@ const authMiddleware = new AuthMiddleware();
 
 modelRouter.post("/", validateCreateModel, modelController.create);
 modelRouter.get("/:id", modelController.findById);
-modelRouter.put("/:id", authMiddleware.auth, modelController.update);
+modelRouter.put("/:id", modelController.update);
 modelRouter.get("/", modelController.findAll);
-modelRouter.post("/:id", authMiddleware.auth, modelController.increaseLike);
-modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
+modelRouter.post("/:id", modelController.increaseLike);
+modelRouter.delete("/:id", modelController.delete);
 
 export default modelRouter;
