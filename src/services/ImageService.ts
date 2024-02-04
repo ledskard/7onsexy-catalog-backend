@@ -73,7 +73,7 @@ export default class ImageService {
 
   public async deleteFromS3(image: IDeleteImageDTO): Promise<void> { 
     
-    image.id && await this.imageRepository.deleteById(image.id);
+    image.id ? await this.imageRepository.deleteById(image.id) : null;
     const params = {
       Bucket: "7onsexycatalogo",
       Key: image.name,
