@@ -137,13 +137,10 @@ export default class ModelService {
 
     public async delete(username: string): Promise<any> {
         const model = await this.modelRepository.findByUsername(username)
-        const images = await this.imageRepository.findByModelId(username);
-        await this.imageRepository.deleteById(model.profileImageId);
+        const images = await this.imageRepository.findByModelId(model.id);
         for(const image of images){
             await this.imageService.deleteFromS3(image);
         }
-        images.forEach(async image => await this.imageService.deleteFromS3(image))
-        await this.imageService.deleteFromS3(model.profileImage)
         return await this.modelRepository.delete(model.id)
     }
 }
