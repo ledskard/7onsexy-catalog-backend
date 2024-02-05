@@ -10,4 +10,5 @@ const authenticateController = new AuthenticateController();
 const authMiddleware = new AuthMiddleware();
 
 userRouter.post("/login", validateAuthenticateUser, authenticateController.authenticate);
+
 export default userRouter;

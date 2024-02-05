@@ -19,9 +19,6 @@ export class Model {
     @Column({ name: "instagram", nullable: true })
     instagram: string;
 
-    @Column({ name: "description" })
-    description: string;
-
     @Column({ name: "type" })
     type: string;
 

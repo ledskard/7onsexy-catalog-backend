@@ -7,11 +7,11 @@ const modelRouter = Router();
 const modelController = new ModelController();
 const authMiddleware = new AuthMiddleware();
 
-modelRouter.post("/", validateCreateModel, modelController.create);
+modelRouter.post("/", authMiddleware.auth, validateCreateModel, modelController.create);
 modelRouter.get("/:id", modelController.findById);
-modelRouter.put("/:id", modelController.update);
+modelRouter.put("/:id", authMiddleware.auth,modelController.update);
 modelRouter.get("/", modelController.findAll);
-modelRouter.post("/:id", modelController.increaseLike);
-modelRouter.delete("/:id", modelController.delete);
+modelRouter.post("/:id",  modelController.increaseLike);
+modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
 
 export default modelRouter;
