@@ -19,7 +19,7 @@ export default class ModelService {
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         try {
-            await Promise.all(data.images.map(async (image) =>  {
+            await Promise.all(data.images.map(async (image) => {
                 if (image?.base64) {
                     try {
                         const imageResponse = await this.imageService.saveFile(image);
@@ -30,21 +30,21 @@ export default class ModelService {
                         throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
                     }
                 }
-        
-            if (data.profileImg?.base64) {
-                try {
-                    const profileImageResponse = await this.imageService.saveFile(data.profileImg);
-                    data.profileImg.url = profileImageResponse.imageUrl;
-                    data.profileImg.name = profileImageResponse.fileName;
-                    delete data.profileImg.base64;
-                    const savedImage = await this.imageRepository.create(data.profileImg)
-                    data.profileImageId = savedImage.id;
-                } catch (error) {
-                    throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+
+                if (data.profileImg?.base64) {
+                    try {
+                        const profileImageResponse = await this.imageService.saveFile(data.profileImg);
+                        data.profileImg.url = profileImageResponse.imageUrl;
+                        data.profileImg.name = profileImageResponse.fileName;
+                        delete data.profileImg.base64;
+                        const savedImage = await this.imageRepository.create(data.profileImg)
+                        data.profileImageId = savedImage.id;
+                    } catch (error) {
+                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                    }
                 }
-            }
             }));
-            
+
             const model = await this.modelRepository.create(data);
             return model;
         } catch (error) {
@@ -59,66 +59,118 @@ export default class ModelService {
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
-   
+
+    public async cancelSubscription(email: string): Promise<Model | undefined> {
+        const model = await this.modelRepository.findByUsername(email)
+        // const modelToBeUpdated = Object.assign(model, { featureFlags: [
+        //     {id: 1,
+        //       name: "enable_social_media",
+        //       description: "Habilitar redes sociais"
+        //     },
+        //     {id: 2,
+        //       name: "enable_star",
+        //       description: "Estrela de modelo PRO"
+        //     },
+        //     {id: 3,
+        //       name: "enable_create_button",
+        //       description: "Habilitar botões"
+        //     }
+        //   ]});
+        const modelToBeUpdated = Object.assign(model, {
+            featureFlags: [
+
+            ]
+        });
+        const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+
+        return modelUpdated;
+    }
+    public async createSubscription(email: string): Promise<Model | undefined> {
+        const model = await this.modelRepository.findByEmail(email)
+        const modelToBeUpdated = Object.assign(model, {
+            featureFlags: [
+                {
+                    id: 1,
+                    name: "enable_social_media",
+                    description: "Habilitar redes sociais"
+                },
+                {
+                    id: 2,
+                    name: "enable_star",
+                    description: "Estrela de modelo PRO"
+                },
+                {
+                    id: 3,
+                    name: "enable_create_button",
+                    description: "Habilitar botões"
+                }
+            ]
+        });
+
+        const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+
+        return modelUpdated;
+    }
+
     public async update(username: string, data: any): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(username);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-    
+
         let oldProfileImageId = null;
-        let oldProfileImageName = null; 
+        let oldProfileImageName = null;
 
         let oldImages = [];
-        if(data.images)
-        await Promise.all(data.images.map(async (image) =>  {
-            if (image?.base64) {
-                try {
-                    const imageResponse = await this.imageService.saveFile(image);
-                    image.url = imageResponse.imageUrl;
-                    image.name = imageResponse.fileName;
-                    delete image.base64;
-                } catch (error) {
-                    throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+        if (data.images)
+            await Promise.all(data.images.map(async (image) => {
+                if (image?.base64) {
+                    try {
+                        const imageResponse = await this.imageService.saveFile(image);
+                        image.url = imageResponse.imageUrl;
+                        image.name = imageResponse.fileName;
+                        delete image.base64;
+                    } catch (error) {
+                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                    }
                 }
-            }
-    
-        if (data.profileImg?.base64) {
-            try {
-                if (model.profileImageId) {
-                    const profileImage = await this.imageRepository.findById(model.profileImageId);
-                    oldProfileImageId = profileImage.id;
-                    oldProfileImageName = profileImage.name;
+
+                if (data.profileImg?.base64) {
+                    try {
+                        if (model.profileImageId) {
+                            const profileImage = await this.imageRepository.findById(model.profileImageId);
+                            oldProfileImageId = profileImage.id;
+                            oldProfileImageName = profileImage.name;
+                        }
+                        const profileImageResponse = await this.imageService.saveFile(data.profileImg);
+                        data.profileImg.url = profileImageResponse.imageUrl;
+                        data.profileImg.name = profileImageResponse.fileName;
+                        delete data.profileImg.base64;
+                        const savedImage = await this.imageRepository.create(data.profileImg)
+                        data.profileImageId = savedImage.id;
+                    } catch (error) {
+                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                    }
                 }
-                const profileImageResponse = await this.imageService.saveFile(data.profileImg);
-                data.profileImg.url = profileImageResponse.imageUrl;
-                data.profileImg.name = profileImageResponse.fileName;
-                delete data.profileImg.base64;
-                const savedImage = await this.imageRepository.create(data.profileImg)
-                data.profileImageId = savedImage.id;
-            } catch (error) {
-                throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
-            }
-        }
-        }));
-        
+            }));
+
         const modelToBeUpdated = Object.assign(model, data);
         const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
-    
+
         if (oldProfileImageId && oldProfileImageName) {
-            await this.imageService.deleteFromS3({id: oldProfileImageId, name: oldProfileImageName});
+            await this.imageService.deleteFromS3({ id: oldProfileImageId, name: oldProfileImageName });
         }
-        if (oldImages.length > 0){
+        if (oldImages.length > 0) {
             for (const image of oldImages) {
-                if(image.id && image.name){
+                if (image.id && image.name) {
                     await this.imageService.deleteFromS3(image.name);
                 }
-            }        
+            }
         }
-        
+
         return modelUpdated;
     }
-    
+
     public async findAll(type?: string): Promise<Model[]> {
-        
+
         const models = await this.modelRepository.findAll(type);
         for (const model of models) {
             const profileImage = await this.imageRepository.findById(model.profileImageId)
@@ -130,7 +182,7 @@ export default class ModelService {
     public async increaseLike(username: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(username);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-        const userToBeUpdated = Object.assign(model, {likes: model.likes + 1});
+        const userToBeUpdated = Object.assign(model, { likes: model.likes + 1 });
         let userUpdated = await this.modelRepository.save(userToBeUpdated);
         return userUpdated;
     }
@@ -138,7 +190,7 @@ export default class ModelService {
     public async delete(username: string): Promise<any> {
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
-        for(const image of images){
+        for (const image of images) {
             await this.imageService.deleteFromS3(image);
         }
         return await this.modelRepository.delete(model.id)

@@ -51,6 +51,18 @@ export class ModelRepository {
         return model;
     }
 
+    public async findByEmail(email: string): Promise<Model | undefined> {
+        const model = await this.modelRepository
+            .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons", "mb")
+            .leftJoinAndSelect("m.featureFlags", "mf")
+            .where("m.email = :email", { email: email })
+            .getOne();
+
+        return model;
+    }
+
     public async save(data: Model): Promise<Model> {
         return await this.modelRepository.save(data);
     }
