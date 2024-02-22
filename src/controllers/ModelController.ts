@@ -17,7 +17,7 @@ export default class ModelController {
         try {
             console.log("cancel", req.body)
             const modelService = new ModelService();
-            await modelService.cancelSubscription(req.body);
+            await modelService.cancelSubscription(req.body.data.subscriber.email);
 
             return res.status(201).send({ success:true });
         } catch (err) {
@@ -29,7 +29,7 @@ export default class ModelController {
         try {
             console.log("create", req.body)
             const modelService = new ModelService();
-            await modelService.cancelSubscription(req.body);
+            await modelService.cancelSubscription(req.body.data.subscriber.email);
 
             return res.status(201).send({ success:true });
         } catch (err) {
