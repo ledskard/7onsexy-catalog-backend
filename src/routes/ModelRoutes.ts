@@ -12,6 +12,7 @@ modelRouter.get("/:id", modelController.findById);
 modelRouter.put("/:id", authMiddleware.auth,modelController.update);
 modelRouter.get("/", modelController.findAll);
 modelRouter.post("/cancel-subscription", modelController.cancelSubscription)
+modelRouter.post("/create-subscription", modelController.createSubscription)
 
 modelRouter.post("/:id",  modelController.increaseLike);
 modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
