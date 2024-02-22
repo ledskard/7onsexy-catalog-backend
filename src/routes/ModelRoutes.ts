@@ -11,6 +11,11 @@ modelRouter.post("/", authMiddleware.auth, validateCreateModel, modelController.
 modelRouter.get("/:id", modelController.findById);
 modelRouter.put("/:id", authMiddleware.auth,modelController.update);
 modelRouter.get("/", modelController.findAll);
+
+modelRouter.post("/validate-token", authMiddleware.auth, 
+(req, res) => { console.log(req.body) 
+    res.status(200).send({status: "200"})})
+
 modelRouter.post("/:id",  modelController.increaseLike);
 modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
 
