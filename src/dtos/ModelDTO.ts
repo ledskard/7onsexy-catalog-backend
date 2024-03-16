@@ -1,6 +1,6 @@
 import { Image } from "../entities/Image";
 
-export interface ICreateModelDTO {    
+export interface ICreateModelDTO {
     username: string;
     description: string;
     likes: number;
@@ -9,6 +9,7 @@ export interface ICreateModelDTO {
     telegramFree: string;
     images: Image[];
     profileImg: Image;
-    email:string;
+    coverImg: Image;
+    email: string;
     profileImageId?: string;
 }

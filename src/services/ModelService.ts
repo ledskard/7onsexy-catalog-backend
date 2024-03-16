@@ -54,8 +54,8 @@ export default class ModelService {
 
     public async findById(userId: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(userId);
-        const profileImage = await this.imageRepository.findById(model.profileImageId)
-        model.profileImage = profileImage;
+        model.profileImage = await this.imageRepository.findById(model.profileImageId)
+        model.coverImage = await this.imageRepository.findById(model.coverImageId);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
@@ -118,9 +118,10 @@ export default class ModelService {
 
         let oldProfileImageId = null;
         let oldProfileImageName = null;
+        let updateData = data;
 
         let oldImages = [];
-        if (data.images)
+        if (data.images) {
             await Promise.all(data.images.map(async (image) => {
                 if (image?.base64) {
                     try {
@@ -132,25 +133,30 @@ export default class ModelService {
                         throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
                     }
                 }
-
-                if (data.profileImg?.base64) {
-                    try {
-                        if (model.profileImageId) {
-                            const profileImage = await this.imageRepository.findById(model.profileImageId);
-                            oldProfileImageId = profileImage.id;
-                            oldProfileImageName = profileImage.name;
-                        }
-                        const profileImageResponse = await this.imageService.saveFile(data.profileImg);
-                        data.profileImg.url = profileImageResponse.imageUrl;
-                        data.profileImg.name = profileImageResponse.fileName;
-                        delete data.profileImg.base64;
-                        const savedImage = await this.imageRepository.create(data.profileImg)
-                        data.profileImageId = savedImage.id;
-                    } catch (error) {
-                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
-                    }
-                }
             }));
+        }
+        if (data.profileImg) {
+            const { newImageId, oldImageId, oldImageName } = await this.processImage(data.profileImg, model.profileImageId, model);
+            if (newImageId) {
+                updateData['profileImageId'] = newImageId;
+            }
+            // Excluindo a imagem antiga do S3
+            if (oldImageId && oldImageName) {
+                await this.imageService.deleteFromS3({ id: oldImageId, name: oldImageName });
+            }
+        }
+
+        // Processando a coverImg
+        if (data.coverImg) {
+            const { newImageId, oldImageId, oldImageName } = await this.processImage(data.coverImg, model.coverImageId, model);
+            if (newImageId) {
+                updateData['coverImageId'] = newImageId;
+            }
+            // Excluindo a imagem antiga do S3
+            if (oldImageId && oldImageName) {
+                await this.imageService.deleteFromS3({ id: oldImageId, name: oldImageName });
+            }
+        }
 
         const modelToBeUpdated = Object.assign(model, data);
         const modelUpdated = await this.modelRepository.save(modelToBeUpdated);
@@ -195,4 +201,28 @@ export default class ModelService {
         }
         return await this.modelRepository.delete(model.id)
     }
+    private async processImage(imageData: any, oldImageId: string | null, model: Model): Promise<{ newImageId: string, oldImageId: string | null, oldImageName: string | null }> {
+        let oldImageName = null;
+
+        if (oldImageId) {
+            const oldImage = await this.imageRepository.findById(oldImageId);
+            oldImageId = oldImage.id;
+            oldImageName = oldImage.name;
+        }
+
+        if (imageData?.base64) {
+            try {
+                const imageResponse = await this.imageService.saveFile(imageData);
+                imageData.url = imageResponse.imageUrl;
+                imageData.name = imageResponse.fileName;
+                delete imageData.base64;
+                const savedImage = await this.imageRepository.create(imageData);
+                return { newImageId: savedImage.id, oldImageId, oldImageName };
+            } catch (error) {
+                throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+            }
+        }
+        return { newImageId: null, oldImageId: null, oldImageName: null };
+    }
+
 }
