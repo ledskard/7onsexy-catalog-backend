@@ -4,21 +4,21 @@ import * as express from 'express';
 import routes from './routes';
 
 const cors = require("cors");
-import {Server} from "http";
+import { Server } from "http";
 import { AppDataSource } from "./database/data-source";
 
 
 AppDataSource.initialize()
-.then(() => {
-    console.log("Data Source has been initialized!")
-})
-.catch((err) => {
-    console.error("Error during Data Source initialization", err)
-})
+    .then(() => {
+        console.log("Data Source has been initialized!")
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization", err)
+    })
 
 const app = express();
 app.use(cors());
-app.use(express.json({limit: '40mb'}));
+app.use(express.json({ limit: '20mb' }));
 app.use(routes);
 
 const port = process.env.PORT || 8080;
