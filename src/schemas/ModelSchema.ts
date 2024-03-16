@@ -39,6 +39,8 @@ export const validateCreateModel = async (
         }),
         likes: Joi.optional(),
         profileImg: Joi.optional(),
+
+        coverImg: Joi.optional(),
         images: Joi.array().items(imageSchema).required().messages({
             "any.required": "O campo images é obrigatório"
         })

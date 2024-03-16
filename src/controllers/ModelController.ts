@@ -36,6 +36,7 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
+    
     public async findById(req: Request, res: Response): Promise<Response> {
         try {
             const { id } = req.params;

@@ -17,6 +17,7 @@ export default class ModelService {
 
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
+        console.log(data.coverImg)
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         try {
             await Promise.all(data.images.map(async (image) => {
@@ -43,6 +44,18 @@ export default class ModelService {
                         throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
                     }
                 }
+                if (data.coverImg?.base64) {
+                  try {
+                      const coverImgResponse = await this.imageService.saveFile(data.coverImg);
+                      data.coverImg.url = coverImgResponse.imageUrl;
+                      data.coverImg.name = coverImgResponse.fileName;
+                      delete data.coverImg.base64;
+                      const savedImage = await this.imageRepository.create(data.coverImg)
+                      data.coverImageId = savedImage.id;
+                  } catch (error) {
+                      throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                  }
+              }
             }));
 
             const model = await this.modelRepository.create(data);
@@ -179,8 +192,8 @@ export default class ModelService {
 
         const models = await this.modelRepository.findAll(type);
         for (const model of models) {
-            const profileImage = await this.imageRepository.findById(model.profileImageId)
-            model.profileImage = profileImage
+          model.profileImage = await this.imageRepository.findById(model.profileImageId)
+            model.coverImage = await this.imageRepository.findById(model.coverImageId)
         }
         return models;
     }
@@ -194,6 +207,7 @@ export default class ModelService {
     }
 
     public async delete(username: string): Promise<any> {
+      console.log('não deletou')
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
         for (const image of images) {

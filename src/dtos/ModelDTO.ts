@@ -12,4 +12,6 @@ export interface ICreateModelDTO {
     coverImg: Image;
     email: string;
     profileImageId?: string;
+    coverImg: Image;
+    coverImageId?: string;
 }
