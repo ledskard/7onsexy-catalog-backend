@@ -1,6 +1,8 @@
 import { ICreateModelDTO } from "../dtos/ModelDTO";
+import { Like } from "../entities/Like";
 import { Model } from "../entities/Model";
 import { ImageRepository } from "../repositories/ImageRepository";
+import { LikeRepository } from "../repositories/LikeRepository";
 import { ModelRepository } from "../repositories/ModelRepository";
 import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
 import ImageService from "./ImageService";
@@ -9,15 +11,17 @@ export default class ModelService {
     private readonly modelRepository: ModelRepository;
     private readonly imageRepository: ImageRepository;
     private readonly imageService: ImageService;
+    private readonly likeRepository: LikeRepository;
     constructor() {
         this.modelRepository = new ModelRepository();
         this.imageRepository = new ImageRepository();
         this.imageService = new ImageService();
+        this.likeRepository = new LikeRepository();
+
     }
 
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
-        console.log(data.coverImg)
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         try {
             await Promise.all(data.images.map(async (image) => {
@@ -188,26 +192,57 @@ export default class ModelService {
         return modelUpdated;
     }
 
+
+    public async findWeeklyMostLiked(): Promise<Model[]> {
+
+      const models = await this.modelRepository.findWeeklyMostLiked();
+      for (const model of models) {
+        if (model.profileImageId) {
+            model.profileImage = await this.imageRepository.findById(model.profileImageId);
+        }
+        if (model.coverImageId) {
+            model.coverImage = await this.imageRepository.findById(model.coverImageId);
+        }
+    }
+
+      return models;
+    }
+
     public async findAll(type?: string): Promise<Model[]> {
 
         const models = await this.modelRepository.findAll(type);
         for (const model of models) {
-          model.profileImage = await this.imageRepository.findById(model.profileImageId)
-            model.coverImage = await this.imageRepository.findById(model.coverImageId)
-        }
+          if (model.profileImageId) {
+              model.profileImage = await this.imageRepository.findById(model.profileImageId);
+          }
+          if (model.coverImageId) {
+              model.coverImage = await this.imageRepository.findById(model.coverImageId);
+          }
+      }
+  
         return models;
     }
 
     public async increaseLike(username: string): Promise<Model | undefined> {
-        const model = await this.modelRepository.findByUsername(username);
-        if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-        const userToBeUpdated = Object.assign(model, { likes: model.likes + 1 });
-        let userUpdated = await this.modelRepository.save(userToBeUpdated);
-        return userUpdated;
+  
+      // Encontra a modelo pelo ID
+      const model = await this.modelRepository.findByUsername(username);
+      if (!model) {
+          throw new Error('Modelo não encontrado');
+      }
+  
+      // Cria um novo like e associa à modelo encontrada
+      const like = new Like();
+      like.model = model;
+      like.date = new Date(); 
+      const modelToBeUpdated = Object.assign(model, { likes: model.likes + 1 });
+  
+      let modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+      await this.likeRepository.save(like);
+       
+      return modelUpdated;
     }
-
     public async delete(username: string): Promise<any> {
-      console.log('não deletou')
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
         for (const image of images) {

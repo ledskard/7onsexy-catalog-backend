@@ -4,6 +4,7 @@ import { Image } from "../entities/Image";
 import { Model } from "../entities/Model";
 import { FeatureFlags } from "../entities/FeatureFlags";
 import { Button } from "../entities/Button";
+import { Like } from "../entities/Like";
 
 
 require('dotenv').config();
@@ -15,6 +16,6 @@ export const AppDataSource =  new DataSource({
     username: process.env.USER_DB,
     password: process.env.PASS_DB,
     database: process.env.DATABASE,
-    entities: [User, Image, Model, FeatureFlags, Button],
+    entities: [User, Image, Model, FeatureFlags, Button, Like],
     migrations: ["src/migrations/*.**"],    
 });

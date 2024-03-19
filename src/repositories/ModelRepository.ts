@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { Model } from "../entities/Model";
 import { AppDataSource } from "../database/data-source";
 import { ICreateModelDTO } from "../dtos/ModelDTO";
+import { startOfWeek, endOfWeek } from 'date-fns';
 
 export class ModelRepository {
     private readonly modelRepository: Repository<Model>;
@@ -36,6 +37,20 @@ export class ModelRepository {
             model.andWhere("m.type = :type", { type })
         }
         return model.getMany();
+    }
+    public async findWeeklyMostLiked():Promise<Model[]> {
+      const startOfTheWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
+    const endOfTheWeek = endOfWeek(new Date(), { weekStartsOn: 1 });
+
+      return this.modelRepository
+        .createQueryBuilder('model')
+        .leftJoin('model.trackingLikes', 'like')
+        .addSelect('COUNT(like.id)', 'likeCount')
+        .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+        .groupBy('model.id')
+        .orderBy('likeCount', 'DESC')
+        .limit(6)
+        .getMany();
     }
 
     public async findByUsername(username: string): Promise<Model | undefined> {

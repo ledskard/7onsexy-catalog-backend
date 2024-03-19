@@ -11,6 +11,7 @@ modelRouter.post("/", authMiddleware.auth, validateCreateModel, modelController.
 modelRouter.get("/:id", modelController.findById);
 modelRouter.put("/:id", authMiddleware.auth,modelController.update);
 modelRouter.get("/", modelController.findAll);
+modelRouter.get("/likes/weekly", modelController.findWeeklyMostLiked);
 modelRouter.post("/cancel-subscription", modelController.cancelSubscription)
 modelRouter.post("/create-subscription", modelController.createSubscription)
 

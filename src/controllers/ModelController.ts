@@ -15,7 +15,6 @@ export default class ModelController {
     }
     public async cancelSubscription(req: Request, res: Response): Promise<Response | void> {
         try {
-            console.log("cancel", req.body.data)
             const modelService = new ModelService();
             await modelService.cancelSubscription(req.body.data.subscriber.email);
 
@@ -68,6 +67,17 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
+    public async findWeeklyMostLiked(req: Request, res: Response): Promise<Response> {
+      try {
+          const { type } = req.query
+          const modelService = new ModelService();
+          const model = await modelService.findWeeklyMostLiked();
+          return res.status(200).json(model);
+      } catch (err) {
+          return ProcessError(res, err);
+      }
+  }
+    
 
     public async increaseLike(req: Request, res: Response): Promise<Response> {
         try {

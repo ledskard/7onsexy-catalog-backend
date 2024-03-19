@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinTable, ManyToMan
 import { Image } from "./Image";
 import { FeatureFlags } from "./FeatureFlags";
 import { Button } from "./Button";
+import { Like } from "./Like";
 
 
 @Entity("model")
@@ -62,6 +63,9 @@ export class Model {
 
     @OneToMany(() => Button, button => button.model, { cascade: true, eager: true })
     buttons: Button[];
+
+    @OneToMany(() => Like, like => like.model)
+    trackingLikes: Like[];
 
     profileImage?: Image;
 
