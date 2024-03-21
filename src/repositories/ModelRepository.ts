@@ -53,7 +53,7 @@ export class ModelRepository {
           queryBuilder.getMany(),
           countQueryBuilder
       ]);
-      console.log(totalCount  )
+      console.log(totalCount)
 
       const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
   
