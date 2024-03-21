@@ -209,6 +209,7 @@ export default class ModelService {
     }
 
     public async findAll(type?: string, page?: number): Promise<{ data: Model[], totalPages: number }> {
+      console.log(type,page)
         const { data, totalPages } = await this.modelRepository.findAll(type, page);
         for (const model of data) {
           if (model.profileImageId) {

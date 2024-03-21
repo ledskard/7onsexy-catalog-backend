@@ -27,15 +27,16 @@ export class ModelRepository {
             .getOne();
         return model;
     }
+    
     public async findAll(type?: string, page = 1): Promise<{ data: Model[], totalPages: number }> {
-      const MODELS_PER_PAGE = 100;
+      const MODELS_PER_PAGE = 30;
       const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
   
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
-          .leftJoinAndSelect("m.images", "mi")
+          .leftJoinAndSelect("m.images", "imagens")
           .leftJoin("m.trackingLikes", "like")
-          .groupBy("m.id")
+          // .groupBy("m.id")
           .orderBy("m.id", "ASC")
           .take(MODELS_PER_PAGE)
           .skip(skip);
@@ -70,10 +71,10 @@ export class ModelRepository {
       return this.modelRepository
         .createQueryBuilder('model')
         .leftJoinAndSelect('model.images', 'mi')
-        .leftJoinAndSelect('model.trackingLikes', 'like')
+        .leftJoin('model.trackingLikes', 'like')
         .addSelect('COUNT(like.id)', 'likeCount')
         .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-        .groupBy('model.id')
+        .groupBy('model.id, mi.id, mi.url, mi.name') // Adicione esta linha para agrupar por model.id
         .orderBy('likeCount', 'DESC')
         .limit(6)
         .getMany();
