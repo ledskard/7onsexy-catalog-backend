@@ -27,24 +27,49 @@ export class ModelRepository {
             .getOne();
         return model;
     }
-    public async findAll(type: string): Promise<Model[]> {
-        const model = await this.modelRepository
-            .createQueryBuilder("m")
-            .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons", "mb")
-            .leftJoinAndSelect("m.featureFlags", "mf")
-        if (type) {
-            model.andWhere("m.type = :type", { type })
-        }
-        return model.getMany();
-    }
+    public async findAll(type?: string, page = 1): Promise<{ data: Model[], totalPages: number }> {
+      const MODELS_PER_PAGE = 2;
+      const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
+  
+      const queryBuilder = this.modelRepository
+          .createQueryBuilder("m")
+          .leftJoin("m.trackingLikes", "like")
+          .groupBy("m.id")
+          .orderBy("m.id", "ASC")
+          .take(MODELS_PER_PAGE)
+          .skip(skip);
+  
+      if (type) {
+          queryBuilder.andWhere("m.type = :type", { type });
+      }
+  
+      // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
+      const countQueryBuilder = this.modelRepository
+          .createQueryBuilder("m")
+          .where(type ? "m.type = :type" : "1=1", { type })
+          .getCount();
+      // Execução em paralelo das consultas
+      const [data, totalCount] = await Promise.all([
+          queryBuilder.getMany(),
+          countQueryBuilder
+      ]);
+      console.log(totalCount  )
+
+      const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
+  
+      return { data, totalPages };
+  }
+  
+  
+
     public async findWeeklyMostLiked():Promise<Model[]> {
       const startOfTheWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
     const endOfTheWeek = endOfWeek(new Date(), { weekStartsOn: 1 });
 
       return this.modelRepository
         .createQueryBuilder('model')
-        .leftJoin('model.trackingLikes', 'like')
+        .leftJoinAndSelect('model.images', 'mi')
+        .leftJoinAndSelect('model.trackingLikes', 'like')
         .addSelect('COUNT(like.id)', 'likeCount')
         .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
         .groupBy('model.id')

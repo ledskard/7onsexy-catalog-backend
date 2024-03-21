@@ -208,10 +208,9 @@ export default class ModelService {
       return models;
     }
 
-    public async findAll(type?: string): Promise<Model[]> {
-
-        const models = await this.modelRepository.findAll(type);
-        for (const model of models) {
+    public async findAll(type?: string, page?: number): Promise<{ data: Model[], totalPages: number }> {
+        const { data, totalPages } = await this.modelRepository.findAll(type, page);
+        for (const model of data) {
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
@@ -220,7 +219,7 @@ export default class ModelService {
           }
       }
   
-        return models;
+        return { data, totalPages };
     }
 
     public async increaseLike(username: string): Promise<Model | undefined> {

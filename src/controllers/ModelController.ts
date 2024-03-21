@@ -58,10 +58,11 @@ export default class ModelController {
     }
         public async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const { type } = req.query
+            const { type, page } = req.query
             const modelService = new ModelService();
             const typeString = type ? type.toString() : null;
-            const model = await modelService.findAll(typeString);
+            const pageString = page ? Number(page) : null;
+            const model = await modelService.findAll(typeString,  pageString);
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);
@@ -69,7 +70,6 @@ export default class ModelController {
     }
     public async findWeeklyMostLiked(req: Request, res: Response): Promise<Response> {
       try {
-          const { type } = req.query
           const modelService = new ModelService();
           const model = await modelService.findWeeklyMostLiked();
           return res.status(200).json(model);
