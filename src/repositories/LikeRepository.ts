@@ -1,19 +1,19 @@
 import { Repository } from "typeorm";
-import { Like } from "../entities/Like";
+import { Likes } from "../entities/Likes";
 import { AppDataSource } from "../database/data-source";
 
 export class LikeRepository {
-    private readonly likeRepository: Repository<Like>;
+    private readonly likeRepository: Repository<Likes>;
 
     constructor() {
-        this.likeRepository = AppDataSource.getRepository(Like);
+        this.likeRepository = AppDataSource.getRepository(Likes);
     }
-    public async create(data: Like): Promise<Like> {
+    public async create(data: Likes): Promise<Likes> {
         const like = await this.likeRepository.create(data);
         await this.likeRepository.save(like);
         return like;
     }
-    public async findById(id: string): Promise<Like | undefined> {
+    public async findById(id: string): Promise<Likes | undefined> {
         const like = await this.likeRepository
         .createQueryBuilder("like")
         .where("like.id = :id", { id })
@@ -21,7 +21,7 @@ export class LikeRepository {
 
         return like;
     }
-    public async findByModelId(id: string): Promise<Like[] | undefined> {
+    public async findByModelId(id: string): Promise<Likes[] | undefined> {
         const like = await this.likeRepository
         .createQueryBuilder("l")
         .leftJoinAndSelect("l.model", "lm")
@@ -31,7 +31,7 @@ export class LikeRepository {
         return like;
     }
 
-    public async save(data: Like): Promise<Like> {
+    public async save(data: Likes): Promise<Likes> {
         return await this.likeRepository.save(data);
     }
     public async deleteById(id: string): Promise<void> {

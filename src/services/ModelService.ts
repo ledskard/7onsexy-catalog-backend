@@ -1,5 +1,5 @@
 import { ICreateModelDTO } from "../dtos/ModelDTO";
-import { Like } from "../entities/Like";
+import { Likes } from "../entities/Likes";
 import { Model } from "../entities/Model";
 import { ImageRepository } from "../repositories/ImageRepository";
 import { LikeRepository } from "../repositories/LikeRepository";
@@ -238,7 +238,7 @@ export default class ModelService {
       }
   
       // Cria um novo like e associa à modelo encontrada
-      const like = new Like();
+      const like = new Likes();
       like.model = model;
       like.date = new Date(); 
       const modelToBeUpdated = Object.assign(model, { likes: model.likes + 1 });

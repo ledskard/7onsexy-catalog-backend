@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Model } from "./Model";
 
-@Entity()
-export class Like {
+@Entity("likes")
+export class Likes {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()
