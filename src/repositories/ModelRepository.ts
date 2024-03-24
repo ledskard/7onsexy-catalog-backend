@@ -37,7 +37,7 @@ export class ModelRepository {
           .leftJoinAndSelect("m.images", "imagens")
           .leftJoin("m.trackingLikes", "like")
           // .groupBy("m.id")
-          .orderBy("m.id", "ASC")
+          .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
           .skip(skip);
   
@@ -79,7 +79,21 @@ export class ModelRepository {
         .limit(6)
         .getMany();
     }
+    public async getLikesByModel():Promise<any> {
+      // const startOfTheWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
+    // const endOfTheWeek = endOfWeek(new Date(), { weekStartsOn: 1 });
 
+      return this.modelRepository
+        .createQueryBuilder('model')
+        // .leftJoinAndSelect('model.images', 'mi')
+        .leftJoin('model.trackingLikes', 'like')
+        // .addSelect('COUNT(like.id)', 'likeCount')
+        // .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+        .groupBy('model.id, mi.id, mi.url, mi.name') // Adicione esta linha para agrupar por model.id
+        .orderBy('likeCount', 'DESC')
+        .limit(6)
+        .getCount();
+    }
     public async findByUsername(username: string): Promise<Model | undefined> {
         const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 

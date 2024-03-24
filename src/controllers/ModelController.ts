@@ -37,15 +37,25 @@ export default class ModelController {
     }
     
     public async findById(req: Request, res: Response): Promise<Response> {
-        try {
-            const { id } = req.params;
-            const modelService = new ModelService();
-            const model = await modelService.findById(id);
-            return res.status(200).json(model);
-        } catch (err) {
-            return ProcessError(res, err);
-        }
-    }
+      try {
+          const { id } = req.params;
+          const modelService = new ModelService();
+          const model = await modelService.findById(id);
+          return res.status(200).json(model);
+      } catch (err) {
+          return ProcessError(res, err);
+      }
+  }
+  public async findById(req: Request, res: Response): Promise<Response> {
+      try {
+          const { id } = req.params;
+          const modelService = new ModelService();
+          const model = await modelService.findById(id);
+          return res.status(200).json(model);
+      } catch (err) {
+          return ProcessError(res, err);
+      }
+  }
     public async update(req: Request, res: Response): Promise<Response> {
         try {
             const { id } = req.params;

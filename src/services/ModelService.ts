@@ -76,6 +76,12 @@ export default class ModelService {
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
+    public async getLikesByModel(userId: string): Promise<any> {
+      const model = await this.modelRepository.findByUsername(userId);
+      
+      if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+      return model;
+  }
 
     public async cancelSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(email)
