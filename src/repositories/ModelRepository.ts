@@ -76,15 +76,15 @@ export class ModelRepository {
     ));
     
     // Calcular o início e o fim da semana em UTC
-    const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
-    const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
-    console.log(startOfTheWeek, endOfTheWeek)
+    // const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
+    // const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
+    // console.log(startOfTheWeek, endOfTheWeek)
     const models = await this.modelRepository
     .createQueryBuilder('model')
     .leftJoinAndSelect('model.images', 'mi')
     .leftJoin('model.trackingLikes', 'like')
     .addSelect('COUNT(like.id)', 'likeCount')
-    .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+    // .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
     .groupBy('model.id, mi.id, mi.url, mi.name')
     .orderBy('likeCount', 'DESC')
     .limit(6)
