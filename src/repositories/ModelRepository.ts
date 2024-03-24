@@ -87,7 +87,7 @@ export class ModelRepository {
     .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
     .groupBy('model.id')
     .orderBy('likeCount', 'DESC')
-    .limit(6)
+    .limit(8)
     .getMany();
       console.log(models)
     return models;
