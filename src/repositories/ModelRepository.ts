@@ -78,6 +78,7 @@ export class ModelRepository {
     // Calcular o início e o fim da semana em UTC
     const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
     const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
+    console.log(startOfTheWeek, endOfTheWeek)
     const models = await this.modelRepository
     .createQueryBuilder('model')
     .leftJoinAndSelect('model.images', 'mi')
