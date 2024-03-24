@@ -81,17 +81,12 @@ export class ModelRepository {
     }
     public async getLikesByModel(username: string):Promise<any> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
-  // const startOfTheWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
-    // const endOfTheWeek = endOfWeek(new Date(), { weekStartsOn: 1 });
 
       return this.modelRepository
         .createQueryBuilder('model')
-        // .leftJoinAndSelect('model.images', 'mi')
         .leftJoin('model.trackingLikes', 'like')
-        // .addSelect('COUNT(like.id)', 'likeCount')
-        // .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+        .addSelect('COUNT(like.id)', 'likeCount')
         .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
-
         .groupBy('model.id, mi.id, mi.url, mi.name') 
         .orderBy('likeCount', 'DESC')
         .limit(6)
