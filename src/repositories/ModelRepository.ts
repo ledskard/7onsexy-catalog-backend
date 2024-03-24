@@ -78,17 +78,18 @@ export class ModelRepository {
     // Calcular o início e o fim da semana em UTC
     const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
     const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
-    
-    return this.modelRepository
-      .createQueryBuilder('model')
-      .leftJoinAndSelect('model.images', 'mi')
-      .leftJoin('model.trackingLikes', 'like')
-      .addSelect('COUNT(like.id)', 'likeCount')
-      .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-      .groupBy('model.id, mi.id, mi.url, mi.name')
-      .orderBy('likeCount', 'DESC')
-      .limit(6)
-      .getMany();
+    const models = await this.modelRepository
+    .createQueryBuilder('model')
+    .leftJoinAndSelect('model.images', 'mi')
+    .leftJoin('model.trackingLikes', 'like')
+    .addSelect('COUNT(like.id)', 'likeCount')
+    .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+    .groupBy('model.id, mi.id, mi.url, mi.name')
+    .orderBy('likeCount', 'DESC')
+    .limit(6)
+    .getMany();
+      console.log(models)
+    return models;
   }
     public async getLikesByModel(username: string):Promise<any> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
