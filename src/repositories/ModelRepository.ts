@@ -65,26 +65,12 @@ export class ModelRepository {
   
 
   public async findWeeklyMostLiked(): Promise<Model[]> {
-    // Criar uma data que representa agora em UTC
-    const now = new Date(Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate(),
-      new Date().getUTCHours(),
-      new Date().getUTCMinutes(),
-      new Date().getUTCSeconds()
-    ));
     
-    // Calcular o início e o fim da semana em UTC
-    // const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
-    // const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
-    // console.log(startOfTheWeek, endOfTheWeek)
     const models = await this.modelRepository
     .createQueryBuilder('model')
     .leftJoinAndSelect('model.images', 'mi')
     .leftJoin('model.trackingLikes', 'like')
     .addSelect('COUNT(like.id)', 'likeCount')
-    // .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
     .groupBy('model.id, mi.id, mi.url, mi.name')
     .orderBy('likeCount', 'DESC')
     .limit(6)
