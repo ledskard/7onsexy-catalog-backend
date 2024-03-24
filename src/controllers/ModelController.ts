@@ -46,11 +46,11 @@ export default class ModelController {
           return ProcessError(res, err);
       }
   }
-  public async findById(req: Request, res: Response): Promise<Response> {
+  public async getLikesByModel(req: Request, res: Response): Promise<Response> {
       try {
           const { id } = req.params;
           const modelService = new ModelService();
-          const model = await modelService.findById(id);
+          const model = await modelService.getLikesByModel(id);
           return res.status(200).json(model);
       } catch (err) {
           return ProcessError(res, err);

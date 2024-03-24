@@ -77,7 +77,7 @@ export default class ModelService {
         return model;
     }
     public async getLikesByModel(userId: string): Promise<any> {
-      const model = await this.modelRepository.findByUsername(userId);
+      const model = await this.modelRepository.getLikesByModel(userId);
       
       if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
       return model;
