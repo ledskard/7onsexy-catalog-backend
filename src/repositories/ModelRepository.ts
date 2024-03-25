@@ -34,6 +34,7 @@ export class ModelRepository {
   
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
+          .leftJoinAndSelect("m.featureFlags", "mf")
           .leftJoinAndSelect("m.images", "imagens")
           .leftJoin("m.trackingLikes", "like")
           // .groupBy("m.id")
