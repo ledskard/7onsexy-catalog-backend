@@ -68,8 +68,9 @@ export default class ModelController {
     }
         public async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const { type, page } = req.query
+            const { type, page, filter } = req.query
             const modelService = new ModelService();
+            const filterString = filter ? filter.toString() : null;
             const typeString = type ? type.toString() : null;
             const pageString = page ? Number(page) : null;
             const model = await modelService.findAll(typeString,  pageString);

@@ -28,7 +28,7 @@ export class ModelRepository {
         return model;
     }
     
-    public async findAll(type?: string, page = 1): Promise<{ data: Model[], totalPages: number }> {
+    public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
       const MODELS_PER_PAGE = 30;
       const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
   
@@ -45,6 +45,9 @@ export class ModelRepository {
       if (type) {
           queryBuilder.andWhere("m.type = :type", { type });
       }
+      
+      if(filter) {
+        queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })        }
   
       // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
       const countQueryBuilder = this.modelRepository
