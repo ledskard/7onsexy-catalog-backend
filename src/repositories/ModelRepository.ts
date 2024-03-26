@@ -69,36 +69,39 @@ export class ModelRepository {
   
 
   public async findWeeklyMostLiked(): Promise<Model[]> {
-    // Criar uma data que representa agora em UTC
     const now = new Date(Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate(),
-      new Date().getUTCHours(),
-      new Date().getUTCMinutes(),
-      new Date().getUTCSeconds()
+        new Date().getUTCFullYear(),
+        new Date().getUTCMonth(),
+        new Date().getUTCDate(),
+        new Date().getUTCHours(),
+        new Date().getUTCMinutes(),
+        new Date().getUTCSeconds()
     ));
-    
-    // Calcular o início e o fim da semana em UTC
-    const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
+
+    const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 });
     const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
-    console.log(startOfTheWeek, endOfTheWeek)
+
     const models = await this.modelRepository
-    .createQueryBuilder('model')
-    .leftJoinAndSelect('model.images', 'mi')
-    .leftJoin('model.trackingLikes', 'like')
-    .innerJoin('model.featureFlags', 'mf') // Alterado para innerJoin para garantir que o modelo tenha FeatureFlags
-    .addSelect('COUNT(like.id)', 'likeCount')
-    .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-    .groupBy('model.id')
-    .orderBy('likeCount', 'DESC')
-    .andWhere('model.')
-    .limit(8)
-    .getMany();
-      console.log(models)
+        .createQueryBuilder('model')
+        .leftJoinAndSelect('model.images', 'mi')
+        .innerJoin('model.featureFlags', 'mf') // Garante modelos com FeatureFlags
+        .leftJoin('model.trackingLikes', 'like')
+        .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+        .addSelect(subQuery => {
+            return subQuery
+                .select('COUNT(likeSub.id)', 'likeCount')
+                .from('Likes', 'likeSub')
+                .where('likeSub.modelId = model.id')
+                .andWhere('likeSub.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek });
+        }, 'likeCount')
+        .groupBy('model.id')
+        .orderBy('likeCount', 'DESC')
+        .limit(8)
+        .getMany();
+
     return models;
-  }
-    public async getLikesByModel(username: string):Promise<any> {
+}
+  public async getLikesByModel(username: string):Promise<any> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
       return this.modelRepository
