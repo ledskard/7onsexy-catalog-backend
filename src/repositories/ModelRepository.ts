@@ -87,10 +87,12 @@ export class ModelRepository {
     .createQueryBuilder('model')
     .leftJoinAndSelect('model.images', 'mi')
     .leftJoin('model.trackingLikes', 'like')
+    .innerJoin('model.featureFlags', 'mf') // Alterado para innerJoin para garantir que o modelo tenha FeatureFlags
     .addSelect('COUNT(like.id)', 'likeCount')
     .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
     .groupBy('model.id')
     .orderBy('likeCount', 'DESC')
+    .andWhere('model.')
     .limit(8)
     .getMany();
       console.log(models)
