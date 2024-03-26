@@ -47,7 +47,7 @@ export class ModelRepository {
       }
       
       if(filter) {
-        model.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })        }
+        queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })        }
   
       // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
       const countQueryBuilder = this.modelRepository
