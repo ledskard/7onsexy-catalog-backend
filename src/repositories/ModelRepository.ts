@@ -3,6 +3,7 @@ import { Model } from "../entities/Model";
 import { AppDataSource } from "../database/data-source";
 import { ICreateModelDTO } from "../dtos/ModelDTO";
 import { startOfWeek, endOfWeek } from 'date-fns';
+import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
 
 export class ModelRepository {
     private readonly modelRepository: Repository<Model>;
@@ -68,33 +69,15 @@ export class ModelRepository {
   
   
 
-  public async findWeeklyMostLiked(): Promise<Model[]> {
-    // Criar uma data que representa agora em UTC
-    const now = new Date(Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate(),
-      new Date().getUTCHours(),
-      new Date().getUTCMinutes(),
-      new Date().getUTCSeconds()
-    ));
-    
-    // Calcular o início e o fim da semana em UTC
-    const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
-    const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
-    console.log(startOfTheWeek, endOfTheWeek)
-    const models = await this.modelRepository
-    .createQueryBuilder('model')
-    .leftJoinAndSelect('model.images', 'mi')
-    .leftJoin('model.trackingLikes', 'like')
-    .addSelect('COUNT(like.id)', 'likeCount')
-    .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-    .groupBy('model.id')
-    .orderBy('likeCount', 'DESC')
-    .limit(8)
+  public async findWeeklyMostLiked(modelIds: string[]): Promise<Model[]> {
+    const models = await AppDataSource.getRepository(Model)
+    .createQueryBuilder("model")
+    .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
+    .where("model.id IN (:...modelIds)", { modelIds })
+    .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
     .getMany();
-      console.log(models)
-    return models;
+
+  return models;
   }
     public async getLikesByModel(username: string):Promise<any> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
@@ -109,16 +92,30 @@ export class ModelRepository {
         .limit(6)
         .getCount();
     }
-    public async findByUsername(username: string): Promise<Model | undefined> {
-        const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
-        const model = await this.modelRepository
-            .createQueryBuilder("m")
-            .leftJoinAndSelect("m.images", "mi")
-            .leftJoinAndSelect("m.buttons", "mb")
-            .leftJoinAndSelect("m.featureFlags", "mf")
-            .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername })
-            .getOne();
+    public async findByUsername(username: string): Promise<Model | undefined> {
+      const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
+
+        let query = this.modelRepository
+        .createQueryBuilder("m")
+        .leftJoinAndSelect("m.images", "mi")
+        .leftJoinAndSelect("m.featureFlags", "mf")
+        .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername });
+
+      const model = await query.getOne();
+
+        if (model.featureFlags && model.featureFlags.length > 0) {
+          const buttons = await this.modelRepository
+              .createQueryBuilder("m")
+              .leftJoinAndSelect("m.buttons", "mb")
+              .where("m.id = :id", { id: model.id })
+              .getOne();
+
+          if (buttons) {
+              model.buttons = buttons.buttons;
+          }
+      }
+
         return model;
     }
 

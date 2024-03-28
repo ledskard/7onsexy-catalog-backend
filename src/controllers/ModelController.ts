@@ -73,7 +73,7 @@ export default class ModelController {
             const filterString = filter ? filter.toString() : null;
             const typeString = type ? type.toString() : null;
             const pageString = page ? Number(page) : null;
-            const model = await modelService.findAll(typeString,  pageString);
+            const model = await modelService.findAll(typeString,  pageString, filterString);
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);

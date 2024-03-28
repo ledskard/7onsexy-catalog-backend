@@ -86,18 +86,7 @@ export default class ModelService {
     public async cancelSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(email)
         // const modelToBeUpdated = Object.assign(model, { featureFlags: [
-        //     {id: 1,
-        //       name: "enable_social_media",
-        //       description: "Habilitar redes sociais"
-        //     },
-        //     {id: 2,
-        //       name: "enable_star",
-        //       description: "Estrela de modelo PRO"
-        //     },
-        //     {id: 3,
-        //       name: "enable_create_button",
-        //       description: "Habilitar botões"
-        //     }
+        //      
         //   ]});
         const modelToBeUpdated = Object.assign(model, {
             featureFlags: [
@@ -200,8 +189,8 @@ export default class ModelService {
 
 
     public async findWeeklyMostLiked(): Promise<Model[]> {
-
-      const models = await this.modelRepository.findWeeklyMostLiked();
+      const modelIds = await this.likeRepository.findWeeklyMostLiked();
+      const models = await this.modelRepository.findWeeklyMostLiked(modelIds);
       for (const model of models) {
         if (model.profileImageId) {
             model.profileImage = await this.imageRepository.findById(model.profileImageId);
