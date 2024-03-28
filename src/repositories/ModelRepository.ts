@@ -30,7 +30,7 @@ export class ModelRepository {
     }
     
     public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-      const MODELS_PER_PAGE = 10;
+      const MODELS_PER_PAGE = 15;
       const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
   
       const queryBuilder = this.modelRepository
