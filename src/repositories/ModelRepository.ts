@@ -77,8 +77,7 @@ export class ModelRepository {
       .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
       .where("model.id IN (:...modelIds)", { modelIds })
       .andWhere("featureFlag.id IS NOT NULL")
-      .take(8) // Certifica-se de que há pelo menos um FeatureFlag associado
-      .getRawMany();
+      .getMany();
       console.log("modelos opr semana", models.length)
     return models;
     }
