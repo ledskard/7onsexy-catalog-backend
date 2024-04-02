@@ -52,8 +52,7 @@ export class LikeRepository {
           .where("like.date BETWEEN :startOfTheWeek AND :endOfTheWeek", { startOfTheWeek, endOfTheWeek }) // Filtra likes na semana atual
           .groupBy("like.modelId") // Agrupa por modelId
           .orderBy("likeCount", "DESC") // Ordena pela contagem de likes em ordem decrescente
-          .take(40) // Limita a 8 modelos
-          .getRawMany(); // Executa a consulta e retorna os resultados brutos
+          .getMany(); // Executa a consulta e retorna os resultados brutos
   
       // Mapeia os resultados para extrair apenas os IDs dos modelos
       const modelIds = topModels.map(result => result.modelId);
