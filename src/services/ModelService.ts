@@ -204,15 +204,24 @@ export default class ModelService {
     }
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-      console.log(type,page)
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
         for (const model of data) {
+          const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
+
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-              model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            let coverImage = await this.imageRepository.findById(model.coverImageId);
+            if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
+                model.coverImage = null;
+            } else {
+                model.coverImage = coverImage;
+            }
           }
+          if (!hasFeatureFlags && model.images && model.images.length > 0) {
+            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+        }
       }
   
         return { data, totalPages };
