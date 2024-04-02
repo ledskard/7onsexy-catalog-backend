@@ -82,19 +82,19 @@ export class ModelRepository {
     }
     
   }
-    public async getLikesByModel(username: string):Promise<any> {
-      const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
+    // public async getLikesByModel(username: string):Promise<any> {
+    //   const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
-      return this.modelRepository
-        .createQueryBuilder('model')
-        .leftJoin('model.trackingLikes', 'like')
-        .addSelect('COUNT(like.id)', 'likeCount')
-        .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
-        .groupBy('model.id, mi.id, mi.url, mi.name') 
-        .orderBy('likeCount', 'DESC')
-        .limit(6)
-        .getCount();
-    }
+    //   return this.modelRepository
+    //     .createQueryBuilder('model')
+    //     .leftJoin('model.trackingLikes', 'like')
+    //     .addSelect('COUNT(like.id)', 'likeCount')
+    //     .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
+    //     .groupBy('model.id, mi.id, mi.url, mi.name') 
+    //     .orderBy('likeCount', 'DESC')
+    //     .limit(6)
+    //     .getCount();
+    // }
 
     public async findByUsername(username: string): Promise<Model | undefined> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;

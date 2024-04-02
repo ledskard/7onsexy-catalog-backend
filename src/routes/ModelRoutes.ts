@@ -14,7 +14,7 @@ modelRouter.get("/", modelController.findAll);
 modelRouter.get("/likes/weekly", modelController.findWeeklyMostLiked);
 modelRouter.post("/cancel-subscription", modelController.cancelSubscription)
 modelRouter.post("/create-subscription", modelController.createSubscription)
-modelRouter.get("/get-likes-by-model/:id", modelController.getLikesByModel)
+// modelRouter.get("/get-likes-by-model/:id", modelController.getLikesByModel)
 modelRouter.post("/:id",  modelController.increaseLike);
 modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
 
