@@ -38,7 +38,7 @@ export class ModelRepository {
           .leftJoinAndSelect("m.featureFlags", "mf")
           .leftJoinAndSelect("m.images", "imagens")
           .leftJoin("m.trackingLikes", "like")
-          // .groupBy("m.id")
+          .groupBy("m.id, imagens.id, mf.id")
           .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
           .skip(skip);
