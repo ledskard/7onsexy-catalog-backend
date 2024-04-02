@@ -60,7 +60,6 @@ export class ModelRepository {
           queryBuilder.getMany(),
           countQueryBuilder
       ]);
-      console.log(totalCount)
 
       const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
   
@@ -70,15 +69,18 @@ export class ModelRepository {
   
 
   public async findWeeklyMostLiked(modelIds: string[]): Promise<Model[]> {
-    const models = await AppDataSource.getRepository(Model)
-    .createQueryBuilder("model")
-    .leftJoinAndSelect("model.images", "mi")
-    .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
-    .where("model.id IN (:...modelIds)", { modelIds })
-    .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
-    .getMany();
-
-  return models;
+    if(modelIds) {
+      const models = await AppDataSource.getRepository(Model)
+      .createQueryBuilder("model")
+      .leftJoinAndSelect("model.images", "mi")
+      .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
+      .where("model.id IN (:...modelIds)", { modelIds })
+      .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
+      .getMany();
+  
+    return models;
+    }
+    
   }
     public async getLikesByModel(username: string):Promise<any> {
       const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
@@ -105,7 +107,7 @@ export class ModelRepository {
 
       const model = await query.getOne();
 
-        if (model.featureFlags && model.featureFlags.length > 0) {
+        if (model && model.featureFlags && model.featureFlags.length > 0) {
           const buttons = await this.modelRepository
               .createQueryBuilder("m")
               .leftJoinAndSelect("m.buttons", "mb")
