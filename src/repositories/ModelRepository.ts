@@ -77,7 +77,7 @@ export class ModelRepository {
       .where("model.id IN (:...modelIds)", { modelIds })
       .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
       .getMany();
-  
+      console.log("modelos opr semana", models)
     return models;
     }
     
