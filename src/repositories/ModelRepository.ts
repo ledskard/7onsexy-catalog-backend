@@ -90,11 +90,10 @@ export class ModelRepository {
     .leftJoin('model.trackingLikes', 'like')
     .addSelect('COUNT(like.id)', 'likeCount')
     .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-    .groupBy('model.id')
+    .groupBy('model.id, mi.id')
     .orderBy('likeCount', 'DESC')
     .limit(8)
     .getMany();
-      console.log(models)
     return models;
   }
     public async getLikesByModel(username: string):Promise<any> {
