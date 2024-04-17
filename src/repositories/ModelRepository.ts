@@ -60,7 +60,6 @@ export class ModelRepository {
           queryBuilder.getMany(),
           countQueryBuilder
       ]);
-      console.log(totalCount)
 
     const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
 
@@ -90,7 +89,7 @@ export class ModelRepository {
     .leftJoin('model.trackingLikes', 'like')
     .addSelect('COUNT(like.id)', 'likeCount')
     .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-    .groupBy('model.id, mi.id')
+    .groupBy('model.id')
     .orderBy('likeCount', 'DESC')
     .limit(8)
     .getMany();
@@ -104,7 +103,7 @@ export class ModelRepository {
         .leftJoin('model.trackingLikes', 'like')
         .addSelect('COUNT(like.id)', 'likeCount')
         .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
-        .groupBy('model.id, mi.id, mi.url, mi.name') 
+        .groupBy('model.id, model.images.id, model.images.url, model.images.name') 
         .orderBy('likeCount', 'DESC')
         .limit(6)
         .getCount();
