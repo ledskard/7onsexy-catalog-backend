@@ -3,6 +3,7 @@ import { Model } from "../entities/Model";
 import { AppDataSource } from "../database/data-source";
 import { ICreateModelDTO } from "../dtos/ModelDTO";
 import { startOfWeek, endOfWeek } from 'date-fns';
+import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
 
 export class ModelRepository {
   private readonly modelRepository: Repository<Model>;
@@ -17,50 +18,49 @@ export class ModelRepository {
     return model;
   }
 
-  public async findById(id: string): Promise<Model | undefined> {
-    const model = await this.modelRepository
-      .createQueryBuilder("m")
-      .leftJoinAndSelect("m.images", "mi")
-      .leftJoinAndSelect("m.buttons", "mb")
-      .leftJoinAndSelect("m.featureFlags", "mf")
-      .where("m.username = :id", { id })
-      .getOne();
-    return model;
-  }
-
-  public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-    const MODELS_PER_PAGE = 30;
-    const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
-
-    const queryBuilder = this.modelRepository
-      .createQueryBuilder("m")
-      .leftJoinAndSelect("m.featureFlags", "mf")
-      .leftJoinAndSelect("m.images", "imagens")
-      .leftJoin("m.trackingLikes", "like")
-      // .groupBy("m.id")
-      .orderBy('m.likes', 'DESC')
-      .take(MODELS_PER_PAGE)
-      .skip(skip);
-
-    if (type) {
-      queryBuilder.andWhere("m.type = :type", { type });
+    public async findById(id: string): Promise<Model | undefined> {
+        const model = await this.modelRepository
+            .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons", "mb")
+            .leftJoinAndSelect("m.featureFlags", "mf")
+            .where("m.username = :id", { id })
+            .getOne();
+        return model;
     }
-
-    if (filter) {
-      queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })
-    }
-
-    // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
-    const countQueryBuilder = this.modelRepository
-      .createQueryBuilder("m")
-      .where(type ? "m.type = :type" : "1=1", { type })
-      .getCount();
-    // Execução em paralelo das consultas
-    const [data, totalCount] = await Promise.all([
-      queryBuilder.getMany(),
-      countQueryBuilder
-    ]);
-    console.log(totalCount)
+    
+    public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
+      const MODELS_PER_PAGE = 30;
+      const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
+  
+      const queryBuilder = this.modelRepository
+          .createQueryBuilder("m")
+          .leftJoinAndSelect("m.featureFlags", "mf")
+          .leftJoinAndSelect("m.images", "imagens")
+          .leftJoin("m.trackingLikes", "like")
+          // .groupBy("m.id")
+          .orderBy('m.likes', 'DESC')
+          .take(MODELS_PER_PAGE)
+          .skip(skip);
+  
+      if (type) {
+          queryBuilder.andWhere("m.type = :type", { type });
+      }
+      
+      if(filter) {
+        queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })        }
+  
+      // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
+      const countQueryBuilder = this.modelRepository
+          .createQueryBuilder("m")
+          .where(type ? "m.type = :type" : "1=1", { type })
+          .getCount();
+      // Execução em paralelo das consultas
+      const [data, totalCount] = await Promise.all([
+          queryBuilder.getMany(),
+          countQueryBuilder
+      ]);
+      console.log(totalCount)
 
     const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
 
@@ -79,47 +79,49 @@ export class ModelRepository {
       new Date().getUTCMinutes(),
       new Date().getUTCSeconds()
     ));
-
+    
     // Calcular o início e o fim da semana em UTC
     const startOfTheWeek = startOfWeek(now, { weekStartsOn: 1 }); // Configurado para começar na segunda-feira
     const endOfTheWeek = endOfWeek(now, { weekStartsOn: 1 });
+    console.log(startOfTheWeek, endOfTheWeek)
     const models = await this.modelRepository
-      .createQueryBuilder('model')
-      .leftJoinAndSelect('model.images', 'mi')
-      .leftJoin('model.trackingLikes', 'like')
-      .addSelect('COUNT(like.id)', 'likeCount')
-      .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
-      .groupBy('model.id')
-      .orderBy('likeCount', 'DESC')
-      .limit(8)
-      .getMany();
+    .createQueryBuilder('model')
+    .leftJoinAndSelect('model.images', 'mi')
+    .leftJoin('model.trackingLikes', 'like')
+    .addSelect('COUNT(like.id)', 'likeCount')
+    .where('like.date BETWEEN :start AND :end', { start: startOfTheWeek, end: endOfTheWeek })
+    .groupBy('model.id')
+    .orderBy('likeCount', 'DESC')
+    .limit(8)
+    .getMany();
+      console.log(models)
     return models;
   }
-  public async getLikesByModel(username: string): Promise<any> {
-    const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
+    public async getLikesByModel(username: string):Promise<any> {
+      const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
-    return this.modelRepository
-      .createQueryBuilder('model')
-      .leftJoin('model.trackingLikes', 'like')
-      .addSelect('COUNT(like.id)', 'likeCount')
-      .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
-      .groupBy('model.id, mi.id, mi.url, mi.name')
-      .orderBy('likeCount', 'DESC')
-      .limit(6)
-      .getCount();
-  }
-  public async findByUsername(username: string): Promise<Model | undefined> {
-    const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
+      return this.modelRepository
+        .createQueryBuilder('model')
+        .leftJoin('model.trackingLikes', 'like')
+        .addSelect('COUNT(like.id)', 'likeCount')
+        .where("REPLACE(model.username, ' ', '') = :username", { username: cleanedUsername })
+        .groupBy('model.id, mi.id, mi.url, mi.name') 
+        .orderBy('likeCount', 'DESC')
+        .limit(6)
+        .getCount();
+    }
+    public async findByUsername(username: string): Promise<Model | undefined> {
+        const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
 
-    const model = await this.modelRepository
-      .createQueryBuilder("m")
-      .leftJoinAndSelect("m.images", "mi")
-      .leftJoinAndSelect("m.buttons", "mb")
-      .leftJoinAndSelect("m.featureFlags", "mf")
-      .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername })
-      .getOne();
-    return model;
-  }
+        const model = await this.modelRepository
+            .createQueryBuilder("m")
+            .leftJoinAndSelect("m.images", "mi")
+            .leftJoinAndSelect("m.buttons", "mb")
+            .leftJoinAndSelect("m.featureFlags", "mf")
+            .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername })
+            .getOne();
+        return model;
+    }
 
   public async findByEmail(email: string): Promise<Model | undefined> {
     const model = await this.modelRepository

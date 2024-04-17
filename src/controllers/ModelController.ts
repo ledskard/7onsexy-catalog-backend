@@ -47,16 +47,16 @@ export default class ModelController {
           return ProcessError(res, err);
       }
   }
-  public async getLikesByModel(req: Request, res: Response): Promise<Response> {
-      try {
-          const { id } = req.params;
-          const modelService = new ModelService();
-          const model = await modelService.getLikesByModel(id);
-          return res.status(200).json(model);
-      } catch (err) {
-          return ProcessError(res, err);
-      }
-  }
+  // public async getLikesByModel(req: Request, res: Response): Promise<Response> {
+  //     try {
+  //         const { id } = req.params;
+  //         const modelService = new ModelService();
+  //         const model = await modelService.getLikesByModel(id);
+  //         return res.status(200).json(model);
+  //     } catch (err) {
+  //         return ProcessError(res, err);
+  //     }
+  // }
     public async update(req: Request, res: Response): Promise<Response> {
         try {
             const { id } = req.params;
@@ -74,7 +74,7 @@ export default class ModelController {
             const filterString = filter ? filter.toString() : null;
             const typeString = type ? type.toString() : null;
             const pageString = page ? Number(page) : null;
-            const model = await modelService.findAll(typeString,  pageString);
+            const model = await modelService.findAll(typeString,  pageString, filterString);
             return res.status(200).json(model);
         } catch (err) {
             return ProcessError(res, err);

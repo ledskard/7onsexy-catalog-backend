@@ -71,33 +71,36 @@ export default class ModelService {
 
     public async findById(userId: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(userId);
-        model.profileImage = await this.imageRepository.findById(model.profileImageId)
-        model.coverImage = await this.imageRepository.findById(model.coverImageId);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+        const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
+
+          if (model.profileImageId) {
+              model.profileImage = await this.imageRepository.findById(model.profileImageId);
+          }
+          if (model.coverImageId) {
+            let coverImage = await this.imageRepository.findById(model.coverImageId);
+            if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
+                model.coverImage = null;
+            } else {
+                model.coverImage = coverImage;
+            }
+          }
+          if (!hasFeatureFlags && model.images && model.images.length > 0) {
+            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+        }
         return model;
     }
-    public async getLikesByModel(userId: string): Promise<any> {
-      const model = await this.modelRepository.getLikesByModel(userId);
+  //   public async getLikesByModel(userId: string): Promise<any> {
+  //     const model = await this.modelRepository.getLikesByModel(userId);
       
-      if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-      return model;
-  }
+  //     if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+  //     return model;
+  // }
 
     public async cancelSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(email)
         // const modelToBeUpdated = Object.assign(model, { featureFlags: [
-        //     {id: 1,
-        //       name: "enable_social_media",
-        //       description: "Habilitar redes sociais"
-        //     },
-        //     {id: 2,
-        //       name: "enable_star",
-        //       description: "Estrela de modelo PRO"
-        //     },
-        //     {id: 3,
-        //       name: "enable_create_button",
-        //       description: "Habilitar botões"
-        //     }
+        //      
         //   ]});
         const modelToBeUpdated = Object.assign(model, {
             featureFlags: [
@@ -200,8 +203,8 @@ export default class ModelService {
 
 
     public async findWeeklyMostLiked(): Promise<Model[]> {
-
-      const models = await this.modelRepository.findWeeklyMostLiked();
+      const modelIds = await this.likeRepository.findWeeklyMostLiked();
+      const models = await this.modelRepository.findWeeklyMostLiked(modelIds);
       for (const model of models) {
         if (model.profileImageId) {
             model.profileImage = await this.imageRepository.findById(model.profileImageId);
@@ -215,15 +218,24 @@ export default class ModelService {
     }
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-      console.log(type,page)
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
         for (const model of data) {
+          const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
+
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-              model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            let coverImage = await this.imageRepository.findById(model.coverImageId);
+            if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
+                model.coverImage = null;
+            } else {
+                model.coverImage = coverImage;
+            }
           }
+          if (!hasFeatureFlags && model.images && model.images.length > 0) {
+            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+        }
       }
   
         return { data, totalPages };
