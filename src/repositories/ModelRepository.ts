@@ -4,6 +4,7 @@ import { AppDataSource } from "../database/data-source";
 import { ICreateModelDTO } from "../dtos/ModelDTO";
 import { startOfWeek, endOfWeek } from 'date-fns';
 import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
+import { Image } from "../entities/Image";
 
 export class ModelRepository {
   private readonly modelRepository: Repository<Model>;
@@ -35,10 +36,15 @@ export class ModelRepository {
   
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
+          .leftJoinAndSelect(subQuery => {
+              return subQuery
+                  .select(["image.id", "image.url"])
+                  .from(Image, "image")
+                  .where("image.model_id = m.id")
+                  .orderBy("image.id", "ASC")
+                  .limit(1);
+          }, "first_image", "first_image.model_id = m.id")
           .leftJoinAndSelect("m.featureFlags", "mf")
-          .leftJoinAndSelect("m.images", "imagens")
-          .leftJoin("m.trackingLikes", "like")
-          // .groupBy("m.id")
           .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
           .skip(skip);
@@ -47,25 +53,25 @@ export class ModelRepository {
           queryBuilder.andWhere("m.type = :type", { type });
       }
       
-      if(filter) {
-        queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` })        }
+      if (filter) {
+          queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` });
+      }
   
-      // Consulta simplificada para contagem total, assumindo índices otimizados e modelagem de dados
       const countQueryBuilder = this.modelRepository
           .createQueryBuilder("m")
           .where(type ? "m.type = :type" : "1=1", { type })
           .getCount();
-      // Execução em paralelo das consultas
+  
       const [data, totalCount] = await Promise.all([
           queryBuilder.getMany(),
           countQueryBuilder
       ]);
-
-    const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
-
-    return { data, totalPages };
+  
+      const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
+  
+      return { data, totalPages };
   }
-
+  
 
 
   public async findWeeklyMostLiked(): Promise<Model[]> {
