@@ -203,8 +203,7 @@ export default class ModelService {
 
 
     public async findWeeklyMostLiked(): Promise<Model[]> {
-      const modelIds = await this.likeRepository.findWeeklyMostLiked();
-      const models = await this.modelRepository.findWeeklyMostLiked(modelIds);
+      const models = await this.modelRepository.findWeeklyMostLiked();
       for (const model of models) {
         if (model.profileImageId) {
             model.profileImage = await this.imageRepository.findById(model.profileImageId);
