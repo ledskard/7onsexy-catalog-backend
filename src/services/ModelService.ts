@@ -269,6 +269,7 @@ public async manageSubscription(): Promise<void> {
         const images = await this.imageRepository.findByModelId(model.id);
         const listadelikes = await this.likeRepository.findByModelId(model.id);
         for(const like of listadelikes) {
+          
           await this.likeRepository.deleteById(like.id);
         }
         for (const image of images) {
