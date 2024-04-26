@@ -6,7 +6,7 @@ import { LikeRepository } from "../repositories/LikeRepository";
 import { ModelRepository } from "../repositories/ModelRepository";
 import { ErrorMessage, ErrorStatus } from "../utils/constants/ErrorConstants";
 import ImageService from "./ImageService";
-
+import axios from 'axios';
 export default class ModelService {
     private readonly modelRepository: ModelRepository;
     private readonly imageRepository: ImageRepository;
@@ -84,10 +84,7 @@ export default class ModelService {
   }
 
     public async cancelSubscription(email: string): Promise<Model | undefined> {
-        const model = await this.modelRepository.findByUsername(email)
-        // const modelToBeUpdated = Object.assign(model, { featureFlags: [
-        //      
-        //   ]});
+        const model = await this.modelRepository.findByEmail(email)
         const modelToBeUpdated = Object.assign(model, {
             featureFlags: [
 
@@ -97,6 +94,37 @@ export default class ModelService {
 
         return modelUpdated;
     }
+
+    
+public async manageSubscription(): Promise<void> {
+  try {
+    const apiUrl = 'https://api.iugu.com/v1/subscriptions';
+    const apiToken = process.env.IUGU_API_TOKEN;
+    const statusFilter = 'active';
+
+    const response = await axios.get(`${apiUrl}?api_token=${apiToken}&status_filter=${statusFilter}`);
+    const activeSubscriptions = response.data.items;
+
+    const activeEmails = activeSubscriptions.map(sub => sub.customer_email);
+    
+    const allModels = await this.modelRepository.findAll();
+
+    for (const model of allModels.data) {
+      if(model && model.email){
+        if (activeEmails.includes(model.email)) {
+          await this.createSubscription(model.email);
+      } else {
+          await this.cancelSubscription(model.email);
+      }
+      }
+      
+    }
+  } catch (error) {
+    console.error('Error managing subscriptions:', error);
+    throw new Error('Failed to manage subscriptions');
+  }
+}
+
     public async createSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByEmail(email)
         const modelToBeUpdated = Object.assign(model, {
@@ -204,7 +232,6 @@ export default class ModelService {
     }
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-      console.log(type,page)
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
         for (const model of data) {
           if (model.profileImageId) {
@@ -240,9 +267,15 @@ export default class ModelService {
     public async delete(username: string): Promise<any> {
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
+        const listadelikes = await this.likeRepository.findByModelId(model.id);
+        for(const like of listadelikes) {
+          await this.likeRepository.deleteById(like.id);
+        }
         for (const image of images) {
             await this.imageService.deleteFromS3(image);
-        }
+        } 
+        
+        
         return await this.modelRepository.delete(model.id)
     }
     private async processImage(imageData: any, oldImageId: string | null, model: Model): Promise<{ newImageId: string, oldImageId: string | null, oldImageName: string | null }> {

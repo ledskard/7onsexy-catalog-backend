@@ -13,24 +13,12 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
-    public async cancelSubscription(req: Request, res: Response): Promise<Response | void> {
+    public async manageSubscription(req: Request, res: Response): Promise<Response | void> {
         try {
             const modelService = new ModelService();
-            await modelService.cancelSubscription(req.body.data.subscriber.email);
+            await modelService.manageSubscription();
 
-            return res.status(201).send({ success:true });
-        } catch (err) {
-            return ProcessError(res, err);
-        }
-    }
-    
-    public async createSubscription(req: Request, res: Response): Promise<Response | void> {
-        try {
-            console.log("create", req.body.data)
-            const modelService = new ModelService();
-            await modelService.cancelSubscription(req.body.data.subscriber.email);
-
-            return res.status(201).send({ success:true });
+            return res.status(200).send({ success:true });
         } catch (err) {
             return ProcessError(res, err);
         }

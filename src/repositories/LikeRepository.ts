@@ -63,7 +63,7 @@ export class LikeRepository {
     public async save(data: Likes): Promise<Likes> {
         return await this.likeRepository.save(data);
     }
-    public async deleteById(id: string): Promise<void> {
+    public async deleteById(id: number): Promise<void> {
     
         await this.likeRepository.delete(id);
     }
