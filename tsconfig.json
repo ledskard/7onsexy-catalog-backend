@@ -11,7 +11,8 @@
       "outDir": "./dist",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "skipDefaultLibCheck": false
    },
    "exclude": ["node_modules", "dist", "**/*spec.ts", "migration/**/*.ts"]
 }
