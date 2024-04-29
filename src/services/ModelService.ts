@@ -269,16 +269,16 @@ public async manageSubscription(): Promise<void> {
     public async delete(username: string): Promise<any> {
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
-        const listadelikes = await this.likeRepository.findByModelId(model.id);
-        
-        for(const like of listadelikes) {
+        const likes = await this.likeRepository.findByModelId(model.id);
+        const buttons = await this.buttonRepository.findByModelId(model.id);
+        for(const like of likes) {
 
           await this.likeRepository.deleteById(like.id);
         }
         for (const image of images) {
             await this.imageService.deleteFromS3(image);
         } 
-        for (const button of model.buttons){
+        for (const button of buttons){
           await this.buttonRepository.deleteById(button.id)
         }
         
