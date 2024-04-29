@@ -61,7 +61,7 @@ export class Model {
     })
     featureFlags?: FeatureFlags[] | string[];
 
-    @OneToMany(() => Button, button => button.model, { cascade: true, eager: true })
+    @OneToMany(() => Button, button => button.model, { cascade: true, eager: true, onDelete: 'CASCADE'})
     buttons: Button[];
 
     @OneToMany(() => Likes, likes => likes.model)
