@@ -1,6 +1,7 @@
 import { ICreateModelDTO } from "../dtos/ModelDTO";
 import { Likes } from "../entities/Likes";
 import { Model } from "../entities/Model";
+import { ButtonRepository } from "../repositories/ButtonRepository";
 import { ImageRepository } from "../repositories/ImageRepository";
 import { LikeRepository } from "../repositories/LikeRepository";
 import { ModelRepository } from "../repositories/ModelRepository";
@@ -12,12 +13,13 @@ export default class ModelService {
     private readonly imageRepository: ImageRepository;
     private readonly imageService: ImageService;
     private readonly likeRepository: LikeRepository;
+    private readonly buttonRepository: ButtonRepository;
     constructor() {
         this.modelRepository = new ModelRepository();
         this.imageRepository = new ImageRepository();
         this.imageService = new ImageService();
         this.likeRepository = new LikeRepository();
-
+        this.buttonRepository = new ButtonRepository();
     }
 
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
@@ -276,7 +278,9 @@ public async manageSubscription(): Promise<void> {
         for (const image of images) {
             await this.imageService.deleteFromS3(image);
         } 
-        
+        for (const button of model.buttons){
+          await this.buttonRepository.deleteById(button.id)
+        }
         
         return await this.modelRepository.delete(model.id)
     }
