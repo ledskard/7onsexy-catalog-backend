@@ -74,7 +74,14 @@ export default class ModelService {
     public async findById(userId: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(userId);
         model.profileImage = await this.imageRepository.findById(model.profileImageId)
-        model.coverImage = await this.imageRepository.findById(model.coverImageId);
+        const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
+        const coverImage= await this.imageRepository.findById(model.coverImageId);
+        
+        if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
+          model.coverImage = null;
+        } else {
+          model.coverImage = coverImage;
+        }
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
@@ -234,17 +241,29 @@ public async manageSubscription(): Promise<void> {
     }
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-        const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
-        for (const model of data) {
-          if (model.profileImageId) {
-              model.profileImage = await this.imageRepository.findById(model.profileImageId);
+        
+      const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
+      for (const model of data) {
+        const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
+
+        if (model.profileImageId) {
+            model.profileImage = await this.imageRepository.findById(model.profileImageId);
+        }
+        if (model.coverImageId) {
+          const coverImage = await this.imageRepository.findById(model.coverImageId);
+          if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
+
+            model.coverImage = null 
+          } else {
+            model.coverImage = coverImage;
           }
-          if (model.coverImageId) {
-              model.coverImage = await this.imageRepository.findById(model.coverImageId);
-          }
+        }
+        if (!hasFeatureFlags && model.images && model.images.length > 0) {
+            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+        }
       }
   
-        return { data, totalPages };
+      return { data, totalPages };
     }
 
     public async increaseLike(username: string): Promise<Model | undefined> {
