@@ -10,7 +10,7 @@ export default class AuthenticateController {
             const tokenService = new TokenService();
             const user = await authenticateService.authenticate(req.body.username, req.body.password);
             const token = await tokenService.generateToken(user);
-            return res.status(200).json({ token: "", user: "" });
+            return res.status(200).json({ token, user });
         } catch (err) {
             return ProcessError(res, err);
         }
