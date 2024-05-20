@@ -86,7 +86,7 @@ export default class ModelService {
             }
           }
           if (!hasFeatureFlags && model.images && model.images.length > 0) {
-            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+            model.images = model.images.filter(image => image.url.toLowerCase().includes('gif'));
         }
         return model;
     }
