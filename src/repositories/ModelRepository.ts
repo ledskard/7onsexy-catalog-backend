@@ -59,12 +59,11 @@ export class ModelRepository {
   
       const countQueryBuilder = this.modelRepository
           .createQueryBuilder("m")
-          .where(type ? "m.type = :type" : "1=1", { type })
-          .getCount();
+          .where(type ? "m.type = :type" : "1=1", { type });
   
       const [data, totalCount] = await Promise.all([
           queryBuilder.getMany(),
-          countQueryBuilder
+          countQueryBuilder.getCount()
       ]);
   
       const totalPages = Math.ceil(totalCount / MODELS_PER_PAGE);
@@ -72,7 +71,6 @@ export class ModelRepository {
       return { data, totalPages };
   }
   
-
 
   public async findWeeklyMostLiked(): Promise<Model[]> {
     // Criar uma data que representa agora em UTC
