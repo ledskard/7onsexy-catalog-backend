@@ -37,18 +37,6 @@ export class ModelRepository {
       // Main query builder for fetching models with pagination
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
-          .leftJoinAndSelect(
-              (qb) => {
-                  return qb
-                      .select(["image.id", "image.url", "image.model_id"])
-                      .from(Image, "image")
-                      .where("image.model_id = m.id")
-                      .orderBy("image.id", "ASC")
-                      .limit(1);
-              },
-              "first_image",
-              "first_image.model_id = m.id"
-          )
           .leftJoinAndSelect("m.featureFlags", "mf")
           .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
