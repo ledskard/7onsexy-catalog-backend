@@ -227,7 +227,7 @@ export default class ModelService {
           if (model.coverImageId) {
             let coverImage = await this.imageRepository.findById(model.coverImageId);
             if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
-                model.coverImage = null;
+                model.coverImage = model.images[0];
             } else {
                 model.coverImage = coverImage;
             }
