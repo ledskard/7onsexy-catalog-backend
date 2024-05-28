@@ -34,16 +34,21 @@ export class ModelRepository {
       const MODELS_PER_PAGE = 18;
       const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
   
+      // Main query builder for fetching models with pagination
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
-          .leftJoinAndSelect(subQuery => {
-              return subQuery
-                  .select(["image.id", "image.url"])
-                  .from(Image, "image")
-                  .where("image.model_id = m.id")
-                  .orderBy("image.id", "ASC")
-                  .limit(1);
-          }, "first_image", "first_image.model_id = m.id")
+          .leftJoinAndSelect(
+              (qb) => {
+                  return qb
+                      .select(["image.id", "image.url", "image.model_id"])
+                      .from(Image, "image")
+                      .where("image.model_id = m.id")
+                      .orderBy("image.id", "ASC")
+                      .limit(1);
+              },
+              "first_image",
+              "first_image.model_id = m.id"
+          )
           .leftJoinAndSelect("m.featureFlags", "mf")
           .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
@@ -52,15 +57,17 @@ export class ModelRepository {
       if (type) {
           queryBuilder.andWhere("m.type = :type", { type });
       }
-      
+  
       if (filter) {
           queryBuilder.andWhere("m.username LIKE :filter", { filter: `%${filter}%` });
       }
   
+      // Count query for total number of models
       const countQueryBuilder = this.modelRepository
           .createQueryBuilder("m")
           .where(type ? "m.type = :type" : "1=1", { type });
   
+      // Execute both queries in parallel
       const [data, totalCount] = await Promise.all([
           queryBuilder.getMany(),
           countQueryBuilder.getCount()
