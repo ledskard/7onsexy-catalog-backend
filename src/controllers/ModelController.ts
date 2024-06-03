@@ -15,7 +15,6 @@ export default class ModelController {
     }
     public async cancelSubscription(req: Request, res: Response): Promise<Response | void> {
         try {
-            console.log("cancelSubscription", req.body.data)
             const modelService = new ModelService();
             await modelService.cancelSubscription(req.body.data.subscriber.email);
 
@@ -27,7 +26,6 @@ export default class ModelController {
     
     public async createSubscription(req: Request, res: Response): Promise<Response | void> {
         try {
-            console.log("createSubscription", req.body)
             const modelService = new ModelService();
             await modelService.cancelSubscription(req.body.data.subscriber.email);
 
