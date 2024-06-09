@@ -38,6 +38,7 @@ export class ModelRepository {
       const queryBuilder = this.modelRepository
           .createQueryBuilder("m")
           .leftJoinAndSelect("m.featureFlags", "mf")
+          // .leftJoinAndSelect("m.images", "mi")
           .orderBy('m.likes', 'DESC')
           .take(MODELS_PER_PAGE)
           .skip(skip);
@@ -108,7 +109,6 @@ export class ModelRepository {
     }
     public async findByUsername(username: string): Promise<Model | undefined> {
         const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
-      console.log("OQ?")
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
