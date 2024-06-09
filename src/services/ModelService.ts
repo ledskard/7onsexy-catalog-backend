@@ -21,6 +21,7 @@ export default class ModelService {
     }
 
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
+      console.log(data)
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         try {
@@ -78,16 +79,14 @@ export default class ModelService {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-            let coverImage = await this.imageRepository.findById(model.coverImageId);
-            if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
-                model.coverImage = null;
-            } else {
-                model.coverImage = coverImage;
+            if(hasFeatureFlags) {
+              let coverImage = await this.imageRepository.findById(model.coverImageId);
+              model.coverImage = coverImage;
             }
           }
           if (!hasFeatureFlags && model.images && model.images.length > 0) {
-            model.images = model.images.filter(image => image.url.toLowerCase().includes('gif'));
-        }
+            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif')).slice(0,3)
+          }
         return model;
     }
   //   public async getLikesByModel(userId: string): Promise<any> {
@@ -139,7 +138,9 @@ export default class ModelService {
     }
 
     public async update(username: string, data: any): Promise<Model | undefined> {
-        const model = await this.modelRepository.findByUsername(username);
+      console.log("SNTES?")  
+      const model = await this.modelRepository.findByUsername(username);
+        
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
 
         let oldProfileImageId = null;
@@ -219,24 +220,23 @@ export default class ModelService {
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
         for (const model of data) {
-          const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
-
+          const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-            let coverImage = await this.imageRepository.findById(model.coverImageId);
-            if (!hasFeatureFlags && coverImage.url.toLowerCase().includes('gif')) {
-                model.coverImage = model.images[0];
-            } else {
-                model.coverImage = coverImage;
+            if(hasFeatureFlags) {
+              let coverImage = await this.imageRepository.findById(model.coverImageId);
+              model.coverImage = coverImage;
             }
-          }
-          if (!hasFeatureFlags && model.images && model.images.length > 0) {
-            model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
-          }
+            if(hasFeatureFlags){
+              model.images = [await this.imageRepository.findFirstByModelIdWithGif(model.id)];
+            }
+            if(!hasFeatureFlags) {
+              model.images = [await this.imageRepository.findFirstByModelIdWithoutGif(model.id)];
+            }
+          }  
       }
-  
         return { data, totalPages };
     }
 

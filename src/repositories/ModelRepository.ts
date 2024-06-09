@@ -108,7 +108,7 @@ export class ModelRepository {
     }
     public async findByUsername(username: string): Promise<Model | undefined> {
         const cleanedUsername = username.includes(' ') ? username.replace(/\s/g, '') : username;
-
+      console.log("OQ?")
         const model = await this.modelRepository
             .createQueryBuilder("m")
             .leftJoinAndSelect("m.images", "mi")
