@@ -233,11 +233,7 @@ export default class ModelService {
             
             if(!hasFeatureFlags) {
               
-              model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
-              if(model.username === 'andry silva'){
-                console.log('AQUI', model.images)
-              
-              }
+              model.images = model.images.filter(image => image.url.toLowerCase().includes('gif'));
               model.coverImage = model.images[0]
             }
           }
