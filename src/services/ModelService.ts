@@ -226,16 +226,17 @@ export default class ModelService {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-            if(hasFeatureFlags) {
-              let coverImage = await this.imageRepository.findById(model.coverImageId);
-              model.coverImage = coverImage;
-            }
-            
             if(!hasFeatureFlags) {
               
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
               model.coverImage = model.images[0];
             }
+            else {
+              let coverImage = await this.imageRepository.findById(model.coverImageId);
+              model.coverImage = coverImage;
+            } 
+            
+            
           }
           model.images.forEach(img => delete img.model);
           
