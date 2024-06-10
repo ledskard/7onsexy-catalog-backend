@@ -234,7 +234,7 @@ export default class ModelService {
             if(!hasFeatureFlags) {
               
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
-              console.log("model.images -> ", model.images)
+              model.coverImage = model.images[0];
             }
           }
           model.images.forEach(img => delete img.model);
