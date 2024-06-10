@@ -232,12 +232,11 @@ export default class ModelService {
             }
             
             if(!hasFeatureFlags) {
-              
-              model.images = model.images.filter(image => image.url.toLowerCase().includes('gif'));
+              model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
               model.coverImage = model.images[0]
             }
           }
-          model.images.forEach(img => delete img.model);
+          // model.images.forEach(img => delete img.model);
           
       }
   
