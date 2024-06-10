@@ -226,17 +226,20 @@ export default class ModelService {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
           if (model.coverImageId) {
-            if(!hasFeatureFlags) {
-              model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
-              model.images = model.images.filter(image => !image.name.toLowerCase().includes('gif'))
-              model.coverImage = model.images[0];
-            }
-            else {
+            if(hasFeatureFlags) {
               let coverImage = await this.imageRepository.findById(model.coverImageId);
               model.coverImage = coverImage;
-            } 
+            }
             
-            
+            if(!hasFeatureFlags) {
+              
+              model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+              if(model.username === 'andry silva'){
+                console.log('AQUI', model.images)
+              
+              }
+              model.coverImage = model.images[0]
+            }
           }
           model.images.forEach(img => delete img.model);
           
