@@ -227,8 +227,8 @@ export default class ModelService {
           }
           if (model.coverImageId) {
             if(!hasFeatureFlags) {
-              
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+              model.images = model.images.filter(image => !image.name.toLowerCase().includes('gif'))
               model.coverImage = model.images[0];
             }
             else {
