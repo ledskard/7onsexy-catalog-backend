@@ -222,6 +222,7 @@ export default class ModelService {
         for (const model of data) {
           
           const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
+          console.log(hasFeatureFlags)
           model.images = await this.imageRepository.findByModelId(model.id);
           model.images.forEach(img => delete img.model);
           if (model.profileImageId) {
