@@ -21,7 +21,7 @@ export default class ModelService {
     }
 
     public async create(data: ICreateModelDTO): Promise<Model | undefined> {
-      console.log(data)
+      // console.log(data)
         const verifyAlreadyExistModel = await this.modelRepository.findByUsername(data.username);
         if (verifyAlreadyExistModel) throw { status: ErrorStatus.bad_request, message: ErrorMessage.user_already_registered }
         try {
@@ -74,7 +74,7 @@ export default class ModelService {
         const model = await this.modelRepository.findByUsername(userId);
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;
-          console.log(model.images)
+          // console.log(model.images)
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
@@ -139,9 +139,9 @@ export default class ModelService {
 
     public async update(username: string, data: any): Promise<Model | undefined> {
         const model = await this.modelRepository.findByUsername(username);
-        console.log(model)
-        // if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-        console.log("depois")
+        // console.log(model)
+        if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+        // console.log("depois")
         let oldProfileImageId = null;
         let oldProfileImageName = null;
         let updateData = data;
@@ -218,7 +218,7 @@ export default class ModelService {
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
-        console.log(data)
+        // console.log(data)
         for (const model of data) {
           const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
           model.images = await this.imageRepository.findByModelId(model.id);
@@ -232,7 +232,9 @@ export default class ModelService {
             }
             
             if(!hasFeatureFlags) {
+              
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+              console.log("model.images -> ", model.images)
             }
           }
           model.images.forEach(img => delete img.model);
