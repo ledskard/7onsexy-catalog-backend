@@ -222,7 +222,6 @@ export default class ModelService {
         for (const model of data) {
           
           const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
-          console.log(hasFeatureFlags)
           model.images = await this.imageRepository.findByModelId(model.id);
           model.images.forEach(img => delete img.model);
           if (model.profileImageId) {
@@ -236,7 +235,7 @@ export default class ModelService {
             
             if(!hasFeatureFlags) {
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
-              model.images.forEach(img => console.log(img.name));
+              model.images
               model.coverImage = model.images[0]
             }
           }
