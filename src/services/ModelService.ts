@@ -220,8 +220,10 @@ export default class ModelService {
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
         // console.log(data)
         for (const model of data) {
+          
           const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
           model.images = await this.imageRepository.findByModelId(model.id);
+          model.images.forEach(img => delete img.model);
           if (model.profileImageId) {
               model.profileImage = await this.imageRepository.findById(model.profileImageId);
           }
@@ -233,10 +235,11 @@ export default class ModelService {
             
             if(!hasFeatureFlags) {
               model.images = model.images.filter(image => !image.url.toLowerCase().includes('gif'));
+              model.images.forEach(img => console.log(img.name));
               model.coverImage = model.images[0]
             }
           }
-          // model.images.forEach(img => delete img.model);
+          
           
       }
   
