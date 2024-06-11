@@ -219,25 +219,25 @@ export default class ModelService {
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
-        for (const model of data) {
-          const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
-          if (model.profileImageId) {
-              model.profileImage = await this.imageRepository.findById(model.profileImageId);
-          }
-          if (model.coverImageId) {
-            if(hasFeatureFlags) {
-              let coverImage = await this.imageRepository.findById(model.coverImageId);
-              model.coverImage = coverImage;
-            }
-            if(hasFeatureFlags){
-              model.images = [await this.imageRepository.findFirstByModelIdWithGif(model.id)];
-            }
-            if(!hasFeatureFlags) {
-              model.images = [await this.imageRepository.findFirstByModelIdWithoutGif(model.id)];
-            }
-          }  
-      }
-        return { data, totalPages };
+      //   for (const model of data) {
+      //     const hasFeatureFlags = model.featureFlags && model.featureFlags.length > 0;  
+      //     if (model.profileImageId) {
+      //         model.profileImage = await this.imageRepository.findById(model.profileImageId);
+      //     }
+      //     if (model.coverImageId) {
+      //       if(hasFeatureFlags) {
+      //         let coverImage = await this.imageRepository.findById(model.coverImageId);
+      //         model.coverImage = coverImage;
+      //       }
+      //       if(hasFeatureFlags){
+      //         model.images = [await this.imageRepository.findFirstByModelIdWithGif(model.id)];
+      //       }
+      //       if(!hasFeatureFlags) {
+      //         model.images = [await this.imageRepository.findFirstByModelIdWithoutGif(model.id)];
+      //       }
+      //     }  
+      // }
+      return { data, totalPages };
     }
 
     public async increaseLike(username: string): Promise<Model | undefined> {
