@@ -105,16 +105,18 @@ export class ModelRepository {
       .where("REPLACE(m.username, ' ', '') = :username", { username: cleanedUsername });
 
     const model = await query.getOne();
+    if (model) {
+      const buttons = await this.modelRepository
+        .createQueryBuilder("m")
+        .leftJoinAndSelect("m.buttons", "mb")
+        .where("m.id = :id", { id: model.id })
+        .getOne();
+      if (buttons) {
+        model.buttons = buttons.buttons;
+      }
 
-    const buttons = await this.modelRepository
-      .createQueryBuilder("m")
-      .leftJoinAndSelect("m.buttons", "mb")
-      .where("m.id = :id", { id: model.id })
-      .getOne();
-
-    if (buttons) {
-      model.buttons = buttons.buttons;
     }
+
 
     return model;
   }
