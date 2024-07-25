@@ -1,0 +1,26 @@
+APP_ENV=dev
+
+HOST_DB=database-1.ciwgd8mquexm.us-east-1.rds.amazonaws.com
+PORT_DB=3306
+USER_DB=admin
+PASS_DB=Galize123
+DATABASE=7onsexy
+
+PORT=8080
+
+# HOST_DB=localhost
+# PORT_DB=3306
+# USER_DB=user
+# PASS_DB=root
+# DATABASE=7onsexy
+
+EXPIRE_TOKEN_MINUTES="1d"
+SECRET_TOKEN="secret"
+
+NODE_ENV=development
+
+ACCESS_KEY=AKIAW2UNQGNHUB6HLDED
+SECRET_ACCESS_KEY=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
+
+AWS_REGION=us-east-1
+S3_BUCKET=7onsexycatalogo
