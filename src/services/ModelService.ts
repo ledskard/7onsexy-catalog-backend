@@ -266,11 +266,11 @@ export default class ModelService {
 
 
     private filterOutGifs(images: Image[]): Image[] {
-        return images.filter(image => !image.url.toLowerCase().endsWith('.gif'));
+        return images.filter(image => !image.url.toLowerCase().includes('.gif'));
     }
 
     private async moveCoverImageToFirstIfGif(model: Model): Promise<void> {
-        if (model.coverImage && model.coverImage.url.toLowerCase().endsWith('.gif')) {
+        if (model.coverImage && model.coverImage.url.toLowerCase().includes('.gif')) {
             model.coverImage = model.images[0];
             if (model.username.toLowerCase() === 'helena filmes') {
                 model.coverImage = await this.imageRepository.findById(model.coverImageId);
