@@ -273,7 +273,7 @@ export default class ModelService {
         if (model.coverImage && model.coverImage.url.toLowerCase().includes('.gif')) {
             model.coverImage = model.images[0];
             // if (model.username.toLowerCase() === 'helena filmes') {
-            model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            // model.coverImage = await this.imageRepository.findById(model.coverImageId);
 
             // }
         }
