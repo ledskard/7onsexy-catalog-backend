@@ -1,4 +1,5 @@
 import { ICreateModelDTO } from "../dtos/ModelDTO";
+import { Image } from "../entities/Image";
 import { Likes } from "../entities/Likes";
 import { Model } from "../entities/Model";
 import { ButtonRepository } from "../repositories/ButtonRepository";
@@ -51,17 +52,17 @@ export default class ModelService {
                     }
                 }
                 if (data.coverImg?.base64) {
-                  try {
-                      const coverImgResponse = await this.imageService.saveFile(data.coverImg);
-                      data.coverImg.url = coverImgResponse.imageUrl;
-                      data.coverImg.name = coverImgResponse.fileName;
-                      delete data.coverImg.base64;
-                      const savedImage = await this.imageRepository.create(data.coverImg)
-                      data.coverImageId = savedImage.id;
-                  } catch (error) {
-                      throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
-                  }
-              }
+                    try {
+                        const coverImgResponse = await this.imageService.saveFile(data.coverImg);
+                        data.coverImg.url = coverImgResponse.imageUrl;
+                        data.coverImg.name = coverImgResponse.fileName;
+                        delete data.coverImg.base64;
+                        const savedImage = await this.imageRepository.create(data.coverImg)
+                        data.coverImageId = savedImage.id;
+                    } catch (error) {
+                        throw { code: ErrorStatus.internal_server_error, message: ErrorMessage.could_not_send_image }
+                    }
+                }
             }));
 
             const model = await this.modelRepository.create(data);
@@ -71,19 +72,12 @@ export default class ModelService {
         }
     }
 
-    public async findById(userId: string): Promise<Model | undefined> {
-        const model = await this.modelRepository.findByUsername(userId);
-        model.profileImage = await this.imageRepository.findById(model.profileImageId)
-        model.coverImage = await this.imageRepository.findById(model.coverImageId);
+    public async getLikesByModel(userId: string): Promise<any> {
+        const model = await this.modelRepository.getLikesByModel(userId);
+
         if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
         return model;
     }
-    public async getLikesByModel(userId: string): Promise<any> {
-      const model = await this.modelRepository.getLikesByModel(userId);
-      
-      if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
-      return model;
-  }
 
     public async cancelSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByEmail(email)
@@ -97,35 +91,35 @@ export default class ModelService {
         return modelUpdated;
     }
 
-    
-public async manageSubscription(): Promise<void> {
-  try {
-    const apiUrl = 'https://api.iugu.com/v1/subscriptions';
-    const apiToken = process.env.IUGU_API_TOKEN;
-    const statusFilter = 'active';
 
-    const response = await axios.get(`${apiUrl}?api_token=${apiToken}&status_filter=${statusFilter}`);
-    const activeSubscriptions = response.data.items;
+    public async manageSubscription(): Promise<void> {
+        try {
+            const apiUrl = 'https://api.iugu.com/v1/subscriptions';
+            const apiToken = process.env.IUGU_API_TOKEN;
+            const statusFilter = 'active';
 
-    const activeEmails = activeSubscriptions.map(sub => sub.customer_email);
-    
-    const allModels = await this.modelRepository.findAll();
+            const response = await axios.get(`${apiUrl}?api_token=${apiToken}&status_filter=${statusFilter}`);
+            const activeSubscriptions = response.data.items;
 
-    for (const model of allModels.data) {
-      if(model && model.email){
-        if (activeEmails.includes(model.email)) {
-          await this.createSubscription(model.email);
-      } else {
-          await this.cancelSubscription(model.email);
-      }
-      }
-      
+            const activeEmails = activeSubscriptions.map(sub => sub.customer_email);
+
+            const allModels = await this.modelRepository.findAll();
+
+            for (const model of allModels.data) {
+                if (model && model.email) {
+                    if (activeEmails.includes(model.email)) {
+                        await this.createSubscription(model.email);
+                    } else {
+                        await this.cancelSubscription(model.email);
+                    }
+                }
+
+            }
+        } catch (error) {
+            console.error('Error managing subscriptions:', error);
+            throw new Error('Failed to manage subscriptions');
+        }
     }
-  } catch (error) {
-    console.error('Error managing subscriptions:', error);
-    throw new Error('Failed to manage subscriptions');
-  }
-}
 
     public async createSubscription(email: string): Promise<Model | undefined> {
         const model = await this.modelRepository.findByEmail(email)
@@ -219,69 +213,107 @@ public async manageSubscription(): Promise<void> {
 
 
     public async findWeeklyMostLiked(): Promise<Model[]> {
-      const modelIds = await this.likeRepository.findWeeklyMostLiked();
-      const models = await this.modelRepository.findWeeklyMostLiked(modelIds);
-      for (const model of models) {
-        if (model.profileImageId) {
-            model.profileImage = await this.imageRepository.findById(model.profileImageId);
+        const modelIds = await this.likeRepository.findWeeklyMostLiked();
+        const models = await this.modelRepository.findWeeklyMostLiked(modelIds);
+        for (const model of models) {
+            if (model.profileImageId) {
+                model.profileImage = await this.imageRepository.findById(model.profileImageId);
+            }
+            if (model.coverImageId) {
+                model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            }
         }
-        if (model.coverImageId) {
-            model.coverImage = await this.imageRepository.findById(model.coverImageId);
-        }
+
+        return models;
     }
 
-      return models;
+    public async findById(userId: string): Promise<Model | undefined> {
+        const model = await this.modelRepository.findByUsername(userId);
+        if (!model) throw { status: ErrorStatus.not_found, message: ErrorMessage.id_not_found };
+
+        model.profileImage = await this.imageRepository.findById(model.profileImageId);
+        model.coverImage = await this.imageRepository.findById(model.coverImageId);
+
+        // Filtrando as imagens para remover os GIFs
+        model.images = this.filterOutGifs(model.images);
+
+        // Verificando e movendo a coverImage se for GIF
+        this.moveCoverImageToFirstIfGif(model);
+
+        return model;
     }
 
     public async findAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
         const { data, totalPages } = await this.modelRepository.findAll(type, page, filter);
+
         for (const model of data) {
-          if (model.profileImageId) {
-              model.profileImage = await this.imageRepository.findById(model.profileImageId);
-          }
-          if (model.coverImageId) {
-              model.coverImage = await this.imageRepository.findById(model.coverImageId);
-          }
-      }
-  
+            if (model.profileImageId) {
+                model.profileImage = await this.imageRepository.findById(model.profileImageId);
+            }
+            if (model.coverImageId) {
+                model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            }
+            // Filtrando as imagens para remover os GIFs
+            model.images = this.filterOutGifs(model.images);
+
+            // Verificando e movendo a coverImage se for GIF
+            this.moveCoverImageToFirstIfGif(model);
+        }
+
         return { data, totalPages };
     }
 
+
+
+    private filterOutGifs(images: Image[]): Image[] {
+        return images.filter(image => !image.url.toLowerCase().endsWith('.gif'));
+    }
+
+    private async moveCoverImageToFirstIfGif(model: Model): Promise<void> {
+        if (model.coverImage && model.coverImage.url.toLowerCase().endsWith('.gif')) {
+            model.coverImage = model.images[0];
+            if (model.username.toLowerCase() === 'helena filmes') {
+                model.coverImage = await this.imageRepository.findById(model.coverImageId);
+
+            }
+        }
+    }
+
     public async increaseLike(username: string): Promise<Model | undefined> {
-  
-      // Encontra a modelo pelo ID
-      const model = await this.modelRepository.findByUsername(username);
-      if (!model) {
-          throw new Error('Modelo não encontrado');
-      }
-  
-      // Cria um novo like e associa à modelo encontrada
-      const like = new Likes();
-      like.model = model;
-      like.date = new Date(); 
-      const modelToBeUpdated = Object.assign(model, { likes: model.likes + 1 });
-  
-      let modelUpdated = await this.modelRepository.save(modelToBeUpdated);
-      await this.likeRepository.save(like);
-       
-      return modelUpdated;
+
+        // Encontra a modelo pelo ID
+        const model = await this.modelRepository.findByUsername(username);
+        if (!model) {
+            throw new Error('Modelo não encontrado');
+        }
+
+        // Cria um novo like e associa à modelo encontrada
+        const like = new Likes();
+        like.model = model;
+        like.date = new Date();
+        const modelToBeUpdated = Object.assign(model, { likes: model.likes + 1 });
+
+        let modelUpdated = await this.modelRepository.save(modelToBeUpdated);
+        await this.likeRepository.save(like);
+
+        return modelUpdated;
     }
     public async delete(username: string): Promise<any> {
         const model = await this.modelRepository.findByUsername(username)
         const images = await this.imageRepository.findByModelId(model.id);
         const likes = await this.likeRepository.findByModelId(model.id);
         const buttons = await this.buttonRepository.findByModelId(model.id);
-        for(const like of likes) {
+        for (const like of likes) {
 
-          await this.likeRepository.deleteById(like.id);
+            await this.likeRepository.deleteById(like.id);
         }
         for (const image of images) {
             await this.imageService.deleteFromS3(image);
-        } 
-        for (const button of buttons){
-          await this.buttonRepository.deleteById(button.id)
         }
-        
+        for (const button of buttons) {
+            await this.buttonRepository.deleteById(button.id)
+        }
+
         return await this.modelRepository.delete(model.id)
     }
     private async processImage(imageData: any, oldImageId: string | null, model: Model): Promise<{ newImageId: string, oldImageId: string | null, oldImageName: string | null }> {

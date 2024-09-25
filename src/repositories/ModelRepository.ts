@@ -72,11 +72,11 @@ export class ModelRepository {
       const models = await AppDataSource.getRepository(Model)
         .createQueryBuilder("model")
         .leftJoinAndSelect("model.images", "mi")
-        .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
-        .where("model.id IN (:...modelIds)", { modelIds })
-        .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
+        // .leftJoin("model.featureFlags", "featureFlag") // Junção com a tabela de FeatureFlags
+        .where("model.id IN (:...modelIds)", { modelIds }).limit(18)
+        // .andWhere("featureFlag.id IS NOT NULL") // Certifica-se de que há pelo menos um FeatureFlag associado
         .getMany();
-      console.log("modelos opr semana", models)
+      // console.log("modelos opr semana", models)
       return models;
     }
 
