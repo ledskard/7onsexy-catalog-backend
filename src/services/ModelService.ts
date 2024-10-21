@@ -264,7 +264,7 @@ export default class ModelService {
     }
 
     public async findReallyAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
-        const { data, totalPages } = await this.modelRepository.findAll();
+        const { data, totalPages } = await this.modelRepository.findReallyAll();
 
         for (const model of data) {
             if (model.profileImageId) {
