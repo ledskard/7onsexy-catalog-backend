@@ -29,6 +29,10 @@ export class ModelRepository {
     return model;
   }
 
+  public async findReallyAll(): Promise<any>{
+    return this.modelRepository.findAll();
+  }
+
   public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
     const MODELS_PER_PAGE = 18;
     const skip = Math.max(0, (page - 1) * MODELS_PER_PAGE);
