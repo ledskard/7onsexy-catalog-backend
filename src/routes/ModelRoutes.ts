@@ -16,6 +16,6 @@ modelRouter.post("/manage-subscription", modelController.manageSubscription)
 modelRouter.get("/get-likes-by-model/:id", modelController.getLikesByModel)
 modelRouter.post("/:id",  modelController.increaseLike);
 modelRouter.delete("/:id", authMiddleware.auth, modelController.delete);
-modelRouter.get("/all", modelController.findReallyAll);
+modelRouter.get("/all/all", modelController.findReallyAll);
 
 export default modelRouter;
