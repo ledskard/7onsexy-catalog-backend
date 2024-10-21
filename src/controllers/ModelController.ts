@@ -67,6 +67,15 @@ export default class ModelController {
             return ProcessError(res, err);
         }
     }
+    public async findReallyAll(req: Request, res: Response): Promise<Response> {
+        try {
+            const modelService = new ModelService();
+            const model = await modelService.findReallyAll();
+            return res.status(200).json(model);
+        } catch (err) {
+            return ProcessError(res, err);
+        }
+    }
     public async findWeeklyMostLiked(req: Request, res: Response): Promise<Response> {
       try {
           const modelService = new ModelService();

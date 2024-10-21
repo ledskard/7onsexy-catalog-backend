@@ -263,6 +263,26 @@ export default class ModelService {
         return { data, totalPages };
     }
 
+    public async findReallyAll(type?: string, page?: number, filter?: string): Promise<{ data: Model[], totalPages: number }> {
+        const { data, totalPages } = await this.modelRepository.findAll();
+
+        for (const model of data) {
+            if (model.profileImageId) {
+                model.profileImage = await this.imageRepository.findById(model.profileImageId);
+            }
+            if (model.coverImageId) {
+                model.coverImage = await this.imageRepository.findById(model.coverImageId);
+            }
+            // Filtrando as imagens para remover os GIFs
+            model.images = this.filterOutGifs(model.images);
+
+            // Verificando e movendo a coverImage se for GIF
+            this.moveCoverImageToFirstIfGif(model);
+        }
+
+        return { data, totalPages };
+    }
+
 
 
     private filterOutGifs(images: Image[]): Image[] {
