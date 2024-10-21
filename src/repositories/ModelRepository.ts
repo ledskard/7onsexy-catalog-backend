@@ -30,7 +30,7 @@ export class ModelRepository {
   }
 
   public async findReallyAll(): Promise<any>{
-    return this.modelRepository.findAll();
+    return this.modelRepository.createQueryBuilder('m').getMany();
   }
 
   public async findAll(type?: string, page = 1, filter?: string): Promise<{ data: Model[], totalPages: number }> {
